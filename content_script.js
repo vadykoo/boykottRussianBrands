@@ -1,16 +1,3 @@
-
-const brandData = [
-  {
-    names: ["Чумак", "Prestigio", "Brand3"], // Add more Ukrainian brands here
-    emoji: "🇺🇦",
-  },
-  {
-    names: ["Demix", "Барʼєр", "Барьер"], // Add more Russian brands here
-    emoji: "☠️",
-  },
-  // Add more brand categories and their corresponding emojis here
-];
-
 // Function to check if the text node already contains an emoji
 function hasEmoji(textNode) {
   const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
@@ -18,17 +5,19 @@ function hasEmoji(textNode) {
 }
 
 // Helper function to add emojis to a given text node
-function addEmojisToTextNode(textNode) {
+function addEmojisToTextNode(textNode, brandData) {
   if (hasEmoji(textNode)) return; // Skip if the text node already contains an emoji
 
   let text = textNode.nodeValue;
 
   brandData.forEach((brandCategory) => {
-    brandCategory.names.forEach((brandName) => {
-      // Replace all occurrences of the brand name with the brand name and corresponding emoji
-      const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
-      text = text.replace(brandRegex, `${brandName} ${brandCategory.emoji}`);
-    });
+    if (brandCategory.enabled) {
+      brandCategory.names.forEach((brandName) => {
+        // Replace all occurrences of the brand name with the brand name and corresponding emoji
+        const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
+        text = text.replace(brandRegex, `${brandName} ${brandCategory.emoji}`);
+      });
+    }
   });
 
   // Apply the modified text back to the text node
@@ -36,32 +25,39 @@ function addEmojisToTextNode(textNode) {
 }
 
 // Function to traverse and add emojis to all text nodes on the page
-function traverseAndAddEmojis(node) {
+function traverseAndAddEmojis(node, brandData) {
   if (node.nodeType === Node.TEXT_NODE) {
-    addEmojisToTextNode(node);
+    addEmojisToTextNode(node, brandData);
   } else if (node.nodeType === Node.ELEMENT_NODE) {
     // Recursively traverse child nodes for element nodes
-    node.childNodes.forEach(traverseAndAddEmojis);
+    node.childNodes.forEach((childNode) => {
+      traverseAndAddEmojis(childNode, brandData);
+    });
   }
 }
 
-// Execute the function when the page is loaded and start observing DOM changes
-window.addEventListener("load", () => {
-  traverseAndAddEmojis(document.body);
+// Retrieve brandData from local storage or use default values
+chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+  // Execute the function when the page is loaded and start observing DOM changes
+  function processPage() {
+    traverseAndAddEmojis(document.body, brandData);
 
-  const observer = new MutationObserver((mutationsList) => {
-    mutationsList.forEach((mutation) => {
-      if (mutation.type === "childList") {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === Node.TEXT_NODE) {
-            addEmojisToTextNode(node);
-          } else if (node.nodeType === Node.ELEMENT_NODE) {
-            traverseAndAddEmojis(node);
-          }
-        });
-      }
+    const observer = new MutationObserver((mutationsList) => {
+      mutationsList.forEach((mutation) => {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              addEmojisToTextNode(node, brandData);
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+              traverseAndAddEmojis(node, brandData);
+            }
+          });
+        }
+      });
     });
-  });
 
-  observer.observe(document, { childList: true, subtree: true });
+    observer.observe(document, { childList: true, subtree: true });
+  }
+
+  window.addEventListener("load", processPage);
 });
