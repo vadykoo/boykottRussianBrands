@@ -39,3 +39,9 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
     createCheckbox(name, enabled);
   });
 });
+
+
+// Send a message to the background script when the popup is opened
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.runtime.sendMessage({ action: 'fetchBrandData' });
+});

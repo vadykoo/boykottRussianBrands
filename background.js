@@ -74,6 +74,9 @@ function fetchBrandDataFromGithub() {
         // Update the names in the brandData with the fetched data
         for (let brandCategory of brandData) {
           if (fetchedBrandData[brandCategory.name]) {
+            // Assuming brandCategory.names is the array you want to filter
+            const uniqueNames = new Set(brandCategory.names);
+            brandCategory.names = [...uniqueNames];
             brandCategory.names = fetchedBrandData[brandCategory.name].map(brand => ({
               names: brand.name, // brand.name is now an array of brand names
               description: brand.description,
@@ -88,3 +91,4 @@ function fetchBrandDataFromGithub() {
     })
     .catch(error => console.error('Error:', error));
 }
+

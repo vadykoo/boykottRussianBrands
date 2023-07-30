@@ -62,28 +62,40 @@ function addEmojisToTextNode(textNode, brandData) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            const brandRegex = new RegExp(`(^|[^\\p{L}])${brandName}($|[^\\p{L}])`, "giu");
-            if (brandRegex.test(textNode.nodeValue)) {
+            const brandRegex = new RegExp(`(^|[^\\p{L}])(${brandName})($|[^\\p{L}])`, "giu");
+            let match;
+            while ((match = brandRegex.exec(textNode.nodeValue))) {
               const parent = textNode.parentNode;
-              const text = textNode.nodeValue;
-              const matchIndex = text.search(brandRegex);
-              const match = text.match(brandRegex)[0];
+              if (!parent) {
+                // The parent element does not exist, skip this iteration
+                break;
+              }
 
-              const span = createBrandSpan(match, brandCategory, brand);
+              const startIndex = match.index + match[1].length;
+              const endIndex = match.index + match[0].length;
 
-              if (matchIndex > 0) {
-                textNode.nodeValue = text.substring(0, matchIndex);
-                parent.insertBefore(span, textNode.nextSibling);
-              } else {
-                textNode.nodeValue = text.substring(match.length);
+              const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, startIndex));
+              const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(endIndex));
+
+              // Check if the parent element still exists before performing insertions
+              if (parent) {
+                parent.insertBefore(preMatchTextNode, textNode);
+                const span = createBrandSpan(match[0], brandCategory, brand);
                 parent.insertBefore(span, textNode);
+
+                // Add a new text node with the remaining text after the inserted emoji
+                const remainingText = textNode.nodeValue.slice(endIndex);
+                if (remainingText) {
+                  const remainingTextNode = document.createTextNode(remainingText);
+                  parent.insertBefore(remainingTextNode, textNode);
+                }
+
+                // Remove the original text node with the matched text and the inserted emoji
+                parent.removeChild(textNode);
               }
 
-              if (textNode.nodeValue.length > 0) {
-                const remainingTextNode = document.createTextNode(textNode.nodeValue);
-                parent.insertBefore(remainingTextNode, span.nextSibling);
-                textNode.nodeValue = text.substring(0, matchIndex);
-              }
+              textNode = postMatchTextNode; // Continue processing the remaining text after the inserted emoji
+              brandRegex.lastIndex = 0; // Reset the regex index for the next iteration
             }
           });
         }
@@ -91,6 +103,9 @@ function addEmojisToTextNode(textNode, brandData) {
     }
   });
 }
+
+
+
 
 // Function to traverse and add emojis to all text nodes on the page
 function traverseAndAddEmojis(node, brandData) {
