@@ -4,69 +4,73 @@ function hasEmoji(textNode) {
   return emojiRegex.test(textNode.nodeValue);
 }
 
+// Function to create a tooltip
+function createTooltip(brand) {
+  const tooltip = document.createElement('div');
+  tooltip.style.display = 'none';
+  tooltip.style.position = 'absolute';
+  tooltip.style.top = '100%';
+  tooltip.style.left = '0';
+  tooltip.style.width = '240px';
+  tooltip.style.padding = '16px';
+  tooltip.style.background = '#e2f8ee';
+  tooltip.style.color = '#414141';
+  tooltip.style.fontSize = '14px';
+  tooltip.style.borderRadius = '8px';
+  tooltip.style.zIndex = '9999';
+
+  let tooltipHTML = '';
+  if (brand.description) {
+    tooltipHTML += `<p>${brand.description}</p>`;
+  }
+  if (brand.linkSource) {
+    tooltipHTML += `<a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>`;
+  }
+  tooltip.innerHTML = tooltipHTML;
+
+  return tooltip;
+}
+
+// Function to create a span element for the brand name and emoji
+function createBrandSpan(match, brandCategory, brand) {
+  const span = document.createElement('span');
+  span.textContent = `${match} ${brandCategory.emoji}`;
+  span.style.cursor = 'pointer';
+  span.style.position = 'relative';
+
+  const tooltip = createTooltip(brand);
+
+  span.addEventListener('mouseover', () => {
+    tooltip.style.display = 'block';
+  });
+
+  span.addEventListener('mouseout', () => {
+    tooltip.style.display = 'none';
+  });
+
+  span.appendChild(tooltip);
+
+  return span;
+}
+
+// Function to add emojis to the text node
 function addEmojisToTextNode(textNode, brandData) {
-  if (hasEmoji(textNode)) return; // Skip if the text node already contains an emoji
+  if (hasEmoji(textNode)) return;
 
   brandData.forEach((brandCategory) => {
     if (brandCategory.enabled) {
       brandCategory.names.forEach((brand) => {
-        // Check if brand.names is defined
         if (brand.names) {
-          brand.names.forEach((brandName) => { // brand.names is now an array of brand names
-            // Replace all occurrences of the brand name with the brand name and corresponding emoji
-            const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
+          brand.names.forEach((brandName) => {
+            const brandRegex = new RegExp(`(^|[^\\p{L}])${brandName}($|[^\\p{L}])`, "giu");
             if (brandRegex.test(textNode.nodeValue)) {
               const parent = textNode.parentNode;
               const text = textNode.nodeValue;
               const matchIndex = text.search(brandRegex);
               const match = text.match(brandRegex)[0];
 
-              // Create a new span element for the brand name and emoji
-              const span = document.createElement('span');
-              span.textContent = `${match} ${brandCategory.emoji}`;
-              span.style.cursor = 'pointer'; // Change the cursor to a pointer when hovering over the span
-              span.style.position = 'relative'; // Set the span's position to relative
-              
-              // Create a tooltip
-              const tooltip = document.createElement('div');
-              tooltip.style.display = 'none';
-              tooltip.style.position = 'absolute';
-              tooltip.style.top = '100%'; // Position the tooltip below the span
-              tooltip.style.left = '0'; // Align the tooltip to the left of the span
-              tooltip.style.width = '240px';
-              tooltip.style.padding = '16px';
-              tooltip.style.background = '#e2f8ee';
-              tooltip.style.color = '#414141';
-              tooltip.style.fontSize = '14px';
-              tooltip.style.borderRadius = '8px';
-              tooltip.style.zIndex = '9999'; // Set a very high z-index
-            
+              const span = createBrandSpan(match, brandCategory, brand);
 
-              // Add the brand description and source link to the tooltip
-              let tooltipHTML = '';
-              if (brand.description) {
-                tooltipHTML += `<p>${brand.description}</p>`;
-              }
-              if (brand.linkSource) {
-                tooltipHTML += `<a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>`;
-              }
-              tooltip.innerHTML = tooltipHTML;
-
-              // Show the tooltip when the mouse hovers over the span
-              span.addEventListener('mouseover', () => {
-                tooltip.style.display = 'block';
-              });
-              
-
-              // Hide the tooltip when the mouse leaves the span
-              span.addEventListener('mouseout', () => {
-                tooltip.style.display = 'none';
-              });
-
-              // Append the tooltip to the span
-              span.appendChild(tooltip);
-
-              // Split the text node and insert the span
               if (matchIndex > 0) {
                 textNode.nodeValue = text.substring(0, matchIndex);
                 parent.insertBefore(span, textNode.nextSibling);
@@ -75,7 +79,6 @@ function addEmojisToTextNode(textNode, brandData) {
                 parent.insertBefore(span, textNode);
               }
 
-              // Create a new text node for the remaining text and insert it after the span
               if (textNode.nodeValue.length > 0) {
                 const remainingTextNode = document.createTextNode(textNode.nodeValue);
                 parent.insertBefore(remainingTextNode, span.nextSibling);
@@ -94,7 +97,6 @@ function traverseAndAddEmojis(node, brandData) {
   if (node.nodeType === Node.TEXT_NODE) {
     addEmojisToTextNode(node, brandData);
   } else if (node.nodeType === Node.ELEMENT_NODE) {
-    // Recursively traverse child nodes for element nodes
     node.childNodes.forEach((childNode) => {
       traverseAndAddEmojis(childNode, brandData);
     });
@@ -103,7 +105,6 @@ function traverseAndAddEmojis(node, brandData) {
 
 // Retrieve brandData from local storage or use default values
 chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
-  // Execute the function when the page is loaded and start observing DOM changes
   function processPage() {
     traverseAndAddEmojis(document.body, brandData);
 

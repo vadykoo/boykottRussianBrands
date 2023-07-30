@@ -1,14 +1,352 @@
 {
   "Russian Brands": [
     {
-      "name": "Demix",
-      "description": "reasons to not buy",
-      "linkSource": "https://exapmple.url"
+      "name": [
+        "Демікс",
+        "Демикс",
+        "Demix"
+      ],
+      "description": "russian",
+      "linkSource": "https://example.url",
+      "category": "Спорт"
     },
     {
-      "name": "Барьер",
-      "description": "reasons to not buy",
-      "linkSource": "https://exapmple.url"
+      "name": [
+        "Бар'єр",
+        "Барьер",
+        "Barrier"
+      ],
+      "description": "russian",
+      "category": ""
+    },
+    {
+      "name": [
+        "Фаберлік",
+        "Фаберлик",
+        "Faberlic"
+      ],
+      "category": "Косметика"
+    },
+    {
+      "name": [
+        "Greenfield",
+        "Грінфілд",
+        "Greenfield"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Тес",
+        "Тесс",
+        "Tess"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Принцеса Нурі",
+        "Принцесса Нури",
+        "Princess Nuri"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Принцеса Гіта",
+        "Принцесса Гита",
+        "Princess Gita"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Принцеса Канді",
+        "Принцесса Канди",
+        "Princess Kandi"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Принцеса Ява",
+        "Принцесса Ява",
+        "Princess Java"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Curtis",
+        "Куртіс",
+        "Curtis"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Richard",
+        "Річард",
+        "Richard"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Травневий",
+        "Травневый",
+        "Travnevyy"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Лісма",
+        "Лисма",
+        "Lisma"
+      ],
+      "category": "Чай"
+    },
+    {
+      "name": [
+        "Тема",
+        "Тема",
+        "Tema"
+      ],
+      "category": "Дитяче харчування"
+    },
+    {
+      "name": [
+        "Агуша",
+        "Агуша",
+        "Agusha"
+      ],
+      "category": "Дитяче харчування"
+    },
+    {
+      "name": [
+        "Засинайко",
+        "Засыпайко",
+        "Zasynayko"
+      ],
+      "category": "Дитяче харчування"
+    },
+    {
+      "name": [
+        "Фіксики",
+        "Фиксики",
+        "Fixies"
+      ],
+      "category": "Дитяче харчування"
+    },
+    {
+      "name": [
+        "Некусайка",
+        "Некусайка",
+        "Nekusayka"
+      ],
+      "category": "Дитяче харчування"
+    },
+    {
+      "name": [
+        "Чудо",
+        "Чудо",
+        "Chudo"
+      ],
+      "category": "Молочні продукти"
+    },
+    {
+      "name": [
+        "Веселий молочник",
+        "Веселый молочник",
+        "Veseliy molochik"
+      ],
+      "category": "Молочні продукти"
+    },
+    {
+      "name": [
+        "Чиста лінія",
+        "Чистая линия",
+        "Chysta liniya"
+      ],
+      "category": "Косметика"
+    },
+    {
+      "name": [
+        "Чорна перлина",
+        "Черная жемчужина",
+        "Chornaya zhemchuzhina"
+      ],
+      "category": "Косметика"
+    },
+    {
+      "name": [
+        "Оксамитні ручки",
+        "Бархатные ручки",
+        "Velvet handles"
+      ],
+      "category": "Косметика"
+    },
+    {
+      "name": [
+        "Рецепти Бабусі Агафі",
+        "Рецепти Бабушки Агафьи",
+        "Babushka Agafi's recipes"
+      ],
+      "category": "Косметика"
+    },
+    {
+      "name": [
+        "Жигулі",
+        "Жигули",
+        "Zhiguli"
+      ],
+      "category": "Пиво"
+    },
+    {
+      "name": [
+        "Балтика",
+        "Балтика",
+        "Baltika"
+      ],
+      "category": "Пиво"
+    },
+    {
+      "name": [
+        "Старий Мельник",
+        "Старый Мельник",
+        "Old Miller"
+      ],
+      "category": "Пиво"
+    },
+    {
+      "name": [
+        "Діоксидин",
+        "Диоксидин",
+        "Dioxidin"
+      ],
+      "category": "Медичні препарати"
+    },
+    {
+      "name": [
+        "Віферон",
+        "Виферон",
+        "Viferon"
+      ],
+      "category": "Медичні препарати"
+    },
+    {
+      "name": [
+        "Єрмоліно",
+        "Ермолино",
+        "Ermolino"
+      ],
+      "category": "Продуктові лінії"
+    },
+    {
+      "name": [
+        "Макфа",
+        "Макфа",
+        "Makfa"
+      ],
+      "description": "підприємець Валерій Юрійович",
+      "category": "Продуктові лінії"
+    },
+    {
+      "name": [
+        "Суші wok",
+        "Євразія",
+        "Sushi wok",
+        "Суши wok"
+      ],
+      "description": "Олексій Фурсів",
+      "category": "Торгові мережі"
+    },
+    {
+      "name": [
+        "Кофе Хауз",
+        "Кофе Хауз",
+        "Coffee House"
+      ],
+      "description": "Тімур Хайрутдінов",
+      "category": "Торгові мережі"
+    },
+    {
+      "name": [
+        "Раптор",
+        "Раптор",
+        "Raptor"
+      ],
+      "category": "Побутова хімія"
+    },
+    {
+      "name": [
+        "Вухатий нянь",
+        "Вухатий нянь",
+        "Big Ear Nanny"
+      ],
+      "category": "Побутова хімія"
+    },
+    {
+      "name": [
+        "Sarma",
+        "Сарма",
+        "Sarma"
+      ],
+      "category": "Побутова хімія"
+    },
+    {
+      "name": [
+        "Glade",
+        "Глейд",
+        "Glade"
+      ],
+      "category": "Побутова хімія"
+    },
+    {
+      "name": [
+        "Gloria Jeans",
+        "Глорія Джинс",
+        "Gloria Jeans"
+      ],
+      "description": "Володимир Мельников",
+      "category": "Одяг"
+    },
+    {
+      "name": [
+        "O'stin",
+        "Остін",
+        "Остин"
+      ],
+      "description": "Спортмастер",
+      "category": "Одяг"
+    },
+    {
+      "name": [
+        "Оджи",
+        "Oodji",
+        "Оджі"
+      ],
+      "description": "Дмитро Гарбузов та Дмитро Єрмаков",
+      "category": "Одяг"
+    },
+    {
+      "name": [
+        "Henderson",
+        "Гендерсон",
+        "Хендерсон"
+      ],
+      "description": "Рубен Арутюнян",
+      "category": "Одяг"
+    },
+    {
+      "name": [
+        "Respect",
+        "Респект",
+        "Respect"
+      ],
+      "description": "Сергій Порутчик",
+      "category": "Одяг"
     }
   ]
 }

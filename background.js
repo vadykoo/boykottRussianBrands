@@ -8,7 +8,7 @@ const defaultBrandData = [
   {
     name: "Russian Brands",
     enabled: true,
-    names: ["Demix", "Барʼєр", "Барьер"], // Add more Russian brands here
+    names: [], // Add more Russian brands here
     emoji: "☠️",
   },
   // Add more brand categories and their corresponding emojis here
