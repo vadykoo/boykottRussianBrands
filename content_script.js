@@ -8,8 +8,6 @@ function hasEmoji(textNode) {
 function addEmojisToTextNode(textNode, brandData) {
   if (hasEmoji(textNode)) return; // Skip if the text node already contains an emoji
 
-  let text = textNode.nodeValue;
-
   brandData.forEach((brandCategory) => {
     if (brandCategory.enabled) {
       brandCategory.names.forEach((brand) => {
@@ -18,30 +16,66 @@ function addEmojisToTextNode(textNode, brandData) {
           brand.names.forEach((brandName) => { // brand.names is now an array of brand names
             // Replace all occurrences of the brand name with the brand name and corresponding emoji
             const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
-            text = text.replace(brandRegex, (match) => {
+            if (brandRegex.test(textNode.nodeValue)) {
+              const parent = textNode.parentNode;
+              const text = textNode.nodeValue;
+              const matchIndex = text.search(brandRegex);
+              const match = text.match(brandRegex)[0];
+
               // Create a new span element for the brand name and emoji
               const span = document.createElement('span');
               span.textContent = `${match} ${brandCategory.emoji}`;
-              span.title = brand.description; // Set the hover text to the brand description
               span.style.cursor = 'pointer'; // Change the cursor to a pointer when hovering over the span
 
-              // Add a click event listener to the span
-              span.addEventListener('click', () => {
-                // Open the brand source link in a new tab when the span is clicked
-                window.open(brand.linkSource, '_blank');
+              // Create a tooltip
+              const tooltip = document.createElement('div');
+              tooltip.style.display = 'none';
+              tooltip.style.position = 'absolute';
+              tooltip.style.backgroundColor = '#f9f9f9';
+              tooltip.style.border = '1px solid #ccc';
+              tooltip.style.padding = '5px';
+              tooltip.style.borderRadius = '5px';
+
+              // Add the brand description and source link to the tooltip
+              tooltip.innerHTML = `
+                <p>${brand.description}</p>
+                <a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>
+              `;
+
+              // Show the tooltip when the mouse hovers over the span
+              span.addEventListener('mouseover', () => {
+                tooltip.style.display = 'block';
               });
 
-              // Return the outer HTML of the span
-              return span.outerHTML;
-            });
+              // Hide the tooltip when the mouse leaves the span
+              span.addEventListener('mouseout', () => {
+                tooltip.style.display = 'none';
+              });
+
+              // Append the tooltip to the span
+              span.appendChild(tooltip);
+
+              // Split the text node and insert the span
+              if (matchIndex > 0) {
+                textNode.nodeValue = text.substring(0, matchIndex);
+                parent.insertBefore(span, textNode.nextSibling);
+              } else {
+                textNode.nodeValue = text.substring(match.length);
+                parent.insertBefore(span, textNode);
+              }
+
+              // Create a new text node for the remaining text and insert it after the span
+              if (textNode.nodeValue.length > 0) {
+                const remainingTextNode = document.createTextNode(textNode.nodeValue);
+                parent.insertBefore(remainingTextNode, span.nextSibling);
+                textNode.nodeValue = text.substring(0, matchIndex);
+              }
+            }
           });
         }
       });
     }
   });
-
-  // Apply the modified text back to the text node
-  textNode.nodeValue = text;
 }
 
 // Function to traverse and add emojis to all text nodes on the page
