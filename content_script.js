@@ -25,20 +25,21 @@ function addEmojisToTextNode(textNode, brandData) {
               const span = document.createElement('span');
               span.textContent = `${match} ${brandCategory.emoji}`;
               span.style.cursor = 'pointer'; // Change the cursor to a pointer when hovering over the span
-
+              span.style.position = 'relative'; // Set the span's position to relative
+              
               // Create a tooltip
               const tooltip = document.createElement('div');
               tooltip.style.display = 'none';
               tooltip.style.position = 'absolute';
+              tooltip.style.top = '100%'; // Position the tooltip below the span
+              tooltip.style.left = '0'; // Align the tooltip to the left of the span
               tooltip.style.width = '240px';
               tooltip.style.padding = '16px';
               tooltip.style.background = '#e2f8ee';
               tooltip.style.color = '#414141';
               tooltip.style.fontSize = '14px';
               tooltip.style.borderRadius = '8px';
-              tooltip.style.flexDirection = 'column';
-              tooltip.style.alignItems = 'flex-start';
-              tooltip.style.zIndex = 99;
+              tooltip.style.zIndex = '9999'; // Set a very high z-index
             
 
               // Add the brand description and source link to the tooltip
@@ -53,8 +54,9 @@ function addEmojisToTextNode(textNode, brandData) {
 
               // Show the tooltip when the mouse hovers over the span
               span.addEventListener('mouseover', () => {
-                tooltip.style.display = 'flex';
+                tooltip.style.display = 'block';
               });
+              
 
               // Hide the tooltip when the mouse leaves the span
               span.addEventListener('mouseout', () => {
