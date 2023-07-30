@@ -4,7 +4,6 @@ function hasEmoji(textNode) {
   return emojiRegex.test(textNode.nodeValue);
 }
 
-// Helper function to add emojis to a given text node
 function addEmojisToTextNode(textNode, brandData) {
   if (hasEmoji(textNode)) return; // Skip if the text node already contains an emoji
 
@@ -31,20 +30,30 @@ function addEmojisToTextNode(textNode, brandData) {
               const tooltip = document.createElement('div');
               tooltip.style.display = 'none';
               tooltip.style.position = 'absolute';
-              tooltip.style.backgroundColor = '#f9f9f9';
-              tooltip.style.border = '1px solid #ccc';
-              tooltip.style.padding = '5px';
-              tooltip.style.borderRadius = '5px';
+              tooltip.style.width = '240px';
+              tooltip.style.padding = '16px';
+              tooltip.style.background = '#e2f8ee';
+              tooltip.style.color = '#414141';
+              tooltip.style.fontSize = '14px';
+              tooltip.style.borderRadius = '8px';
+              tooltip.style.flexDirection = 'column';
+              tooltip.style.alignItems = 'flex-start';
+              tooltip.style.zIndex = 99;
+            
 
               // Add the brand description and source link to the tooltip
-              tooltip.innerHTML = `
-                <p>${brand.description}</p>
-                <a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>
-              `;
+              let tooltipHTML = '';
+              if (brand.description) {
+                tooltipHTML += `<p>${brand.description}</p>`;
+              }
+              if (brand.linkSource) {
+                tooltipHTML += `<a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>`;
+              }
+              tooltip.innerHTML = tooltipHTML;
 
               // Show the tooltip when the mouse hovers over the span
               span.addEventListener('mouseover', () => {
-                tooltip.style.display = 'block';
+                tooltip.style.display = 'flex';
               });
 
               // Hide the tooltip when the mouse leaves the span
