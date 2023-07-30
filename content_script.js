@@ -12,10 +12,30 @@ function addEmojisToTextNode(textNode, brandData) {
 
   brandData.forEach((brandCategory) => {
     if (brandCategory.enabled) {
-      brandCategory.names.forEach((brandName) => {
-        // Replace all occurrences of the brand name with the brand name and corresponding emoji
-        const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
-        text = text.replace(brandRegex, `${brandName} ${brandCategory.emoji}`);
+      brandCategory.names.forEach((brand) => {
+        // Check if brand.names is defined
+        if (brand.names) {
+          brand.names.forEach((brandName) => { // brand.names is now an array of brand names
+            // Replace all occurrences of the brand name with the brand name and corresponding emoji
+            const brandRegex = new RegExp(`\\b${brandName}\\b`, "gi");
+            text = text.replace(brandRegex, (match) => {
+              // Create a new span element for the brand name and emoji
+              const span = document.createElement('span');
+              span.textContent = `${match} ${brandCategory.emoji}`;
+              span.title = brand.description; // Set the hover text to the brand description
+              span.style.cursor = 'pointer'; // Change the cursor to a pointer when hovering over the span
+
+              // Add a click event listener to the span
+              span.addEventListener('click', () => {
+                // Open the brand source link in a new tab when the span is clicked
+                window.open(brand.linkSource, '_blank');
+              });
+
+              // Return the outer HTML of the span
+              return span.outerHTML;
+            });
+          });
+        }
       });
     }
   });
