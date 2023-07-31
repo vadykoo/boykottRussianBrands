@@ -45,3 +45,16 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
 document.addEventListener('DOMContentLoaded', () => {
   chrome.runtime.sendMessage({ action: 'fetchBrandData' });
 });
+
+const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
+const brandCount = document.getElementById("brandCount");
+
+fetchBrandDataButton.addEventListener("click", () => {
+  chrome.runtime.sendMessage({ action: 'fetchBrandData' }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError.message);
+    } else {
+      brandCount.textContent = `Number of brands: ${response.brandCount}`;
+    }
+  });
+});
