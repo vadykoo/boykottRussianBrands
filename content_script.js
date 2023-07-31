@@ -6,6 +6,10 @@ function hasEmoji(textNode) {
 
 // Function to create a tooltip
 function createTooltip(brand) {
+  if (!brand.description || !brand.linkSource) {
+    return null;
+  }
+
   const tooltip = document.createElement('div');
   tooltip.style.display = 'none';
   tooltip.style.position = 'absolute';
@@ -35,20 +39,22 @@ function createTooltip(brand) {
 function createBrandSpan(match, brandCategory, brand) {
   const span = document.createElement('span');
   span.textContent = `${match} ${brandCategory.emoji}`;
-  span.style.cursor = 'pointer';
+  // span.style.cursor = 'pointer';
   span.style.position = 'relative';
 
   const tooltip = createTooltip(brand);
 
-  span.addEventListener('mouseover', () => {
-    tooltip.style.display = 'block';
-  });
+  if (tooltip) {
+    span.addEventListener('mouseover', () => {
+      tooltip.style.display = 'block';
+    });
 
-  span.addEventListener('mouseout', () => {
-    tooltip.style.display = 'none';
-  });
+    span.addEventListener('mouseout', () => {
+      tooltip.style.display = 'none';
+    });
 
-  span.appendChild(tooltip);
+    span.appendChild(tooltip);
+  }
 
   return span;
 }
