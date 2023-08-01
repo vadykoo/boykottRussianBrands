@@ -96,8 +96,4 @@
       "run_at": "document_idle"
     }
   ]
-  ,
-  "host_permissions": [
-    "*://*.githubusercontent.com/*"
-  ]
 }
