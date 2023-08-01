@@ -1,96 +1,103 @@
 {
-    "manifest_version": 3,
-    "name": "Boykott Russian Brands",
-    "version": "1.0",
-    "description": "Mark Ukrainian brands with a Ukrainian flag emoji and Russian brands with a skull emoji.",
-    "icons": {
+  "manifest_version": 3,
+  "name": "Boykott Russian Brands",
+  "version": "1.0",
+  "description": "Mark Ukrainian brands with a Ukrainian flag emoji and Russian brands with a skull emoji.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "action": {
-      "default_icon": {
-        "16": "icons/icon16.png",
-        "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
-      },
-      "default_popup": "popup.html"
-    },
-    "content_scripts": [
-      {
-          "matches": [
-            "*://*.romb.ua/*",
-            "*://*.am.ua/*",
-            "*://*.vitals-rv.com.ua/*",
-            "*://*.rozetka.com.ua/*",
-            "*://*.stroymagazin.com.ua/*",
-            "*://*.rovo.org.ua/*",
-            "*://*.vitals-ukraine.com.ua/*",
-            "*://*.toolmaster.kiev.ua/*",
-            "*://*.vitals.pro/*",
-            "*://*.f.ua/*",
-            "*://*.profitehnika.com.ua/*",
-            "*://*.traktorci.com.ua/*",
-            "*://*.storgom.ua/*",
-            "*://*.abo.ua/*",
-            "*://*.instrument.in.ua/*",
-            "*://*.santeho.com.ua/*",
-            "*://*.takida.com.ua/*",
-            "*://*.mirmark.com.ua/*",
-            "*://*.motodnepr.com.ua/*",
-            "*://*.sea-tools.com.ua/*",
-            "*://*.profteh.in.ua/*",
-            "*://*.shponka-plus.com.ua/*",
-            "*://*.allo.ua/*",
-            "*://*.kactus.com.ua/*",
-            "*://*.epicentrk.ua/*",
-            "*://*.nl.ua/*",
-            "*://*.zhuk.ua/*",
-            "*://*.za-bey.com/*",
-            "*://*.vitaltechno.ua/*",
-            "*://*.motoblok.biz/*",
-            "*://*.gurkit.ua/*",
-            "*://*.sertan.com.ua/*",
-            "*://*.olx.ua/*",
-            "*://*.kasta.ua/*",
-            "*://*.prom.ua/*",
-            "*://*.izi.ua/*",
-            "*://*.bigl.ua/*",
-            "*://*.shafa.ua/*",
-            "*://*.boo.ua/ua/*",
-            "*://*.skidka.ua/*",
-            "*://*.zakupka.com/*",
-            "*://*.mriyar.ua/*",
-            "*://*.privatmarket.com/*",
-            "*://*.athletics.kiev.ua/*",
-            "*://*.hotline.ua/*",
-            "https://megamarket.zakaz.ua/*",
-            "https://varus.zakaz.ua/*",
-            "https://novus.zakaz.ua/*",
-            "https://pchelka.zakaz.ua/*",
-            "https://eko.zakaz.ua/*",
-            "https://ultramarket.zakaz.ua/*",
-            "https://auchan.zakaz.ua/*",
-            "https://cosmos.zakaz.ua/*",
-            "https://tavriav.zakaz.ua/*",
-            "https://auchan.ua/*",
-            "https://fozzyshop.ua/*",
-            "https://megamarket.ua/*",
-            "https://zakaz.atbmarket.com/*",
-            "https://shop.silpo.ua/*",
-            "https://shop.nashkraj.ua/*",
-            "https://ek.ua/*",
-            "https://m.ua/*"
-          ],        
-        "js": ["content_script.js"],
-        "type": "module"
-      }
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "permissions": [
-      "storage"
-    ]
-  }
-  
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.romb.ua/*",
+        "*://*.am.ua/*",
+        "*://*.vitals-rv.com.ua/*",
+        "*://*.rozetka.com.ua/*",
+        "*://*.stroymagazin.com.ua/*",
+        "*://*.rovo.org.ua/*",
+        "*://*.vitals-ukraine.com.ua/*",
+        "*://*.toolmaster.kiev.ua/*",
+        "*://*.vitals.pro/*",
+        "*://*.f.ua/*",
+        "*://*.profitehnika.com.ua/*",
+        "*://*.traktorci.com.ua/*",
+        "*://*.storgom.ua/*",
+        "*://*.abo.ua/*",
+        "*://*.instrument.in.ua/*",
+        "*://*.santeho.com.ua/*",
+        "*://*.takida.com.ua/*",
+        "*://*.mirmark.com.ua/*",
+        "*://*.motodnepr.com.ua/*",
+        "*://*.sea-tools.com.ua/*",
+        "*://*.profteh.in.ua/*",
+        "*://*.shponka-plus.com.ua/*",
+        "*://*.allo.ua/*",
+        "*://*.kactus.com.ua/*",
+        "*://*.epicentrk.ua/*",
+        "*://*.nl.ua/*",
+        "*://*.zhuk.ua/*",
+        "*://*.za-bey.com/*",
+        "*://*.vitaltechno.ua/*",
+        "*://*.motoblok.biz/*",
+        "*://*.gurkit.ua/*",
+        "*://*.sertan.com.ua/*",
+        "*://*.olx.ua/*",
+        "*://*.kasta.ua/*",
+        "*://*.prom.ua/*",
+        "*://*.izi.ua/*",
+        "*://*.bigl.ua/*",
+        "*://*.shafa.ua/*",
+        "*://*.boo.ua/ua/*",
+        "*://*.skidka.ua/*",
+        "*://*.zakupka.com/*",
+        "*://*.mriyar.ua/*",
+        "*://*.privatmarket.com/*",
+        "*://*.athletics.kiev.ua/*",
+        "*://*.hotline.ua/*",
+        "https://megamarket.zakaz.ua/*",
+        "https://varus.zakaz.ua/*",
+        "https://novus.zakaz.ua/*",
+        "https://pchelka.zakaz.ua/*",
+        "https://eko.zakaz.ua/*",
+        "https://ultramarket.zakaz.ua/*",
+        "https://auchan.zakaz.ua/*",
+        "https://cosmos.zakaz.ua/*",
+        "https://tavriav.zakaz.ua/*",
+        "https://auchan.ua/*",
+        "https://fozzyshop.ua/*",
+        "https://megamarket.ua/*",
+        "https://zakaz.atbmarket.com/*",
+        "https://shop.silpo.ua/*",
+        "https://shop.nashkraj.ua/*",
+        "https://ek.ua/*",
+        "https://m.ua/*"
+      ],
+      "js": [
+        "content_script.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
+}
