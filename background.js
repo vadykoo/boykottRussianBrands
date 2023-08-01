@@ -6,7 +6,7 @@ const defaultBrandData = [
   //   emoji: "🇺🇦",
   // },
   {
-    name: "russian Brands",
+    name: "Russian Brands",
     enabled: true,
     names: [], // Add more Russian brands here
     emoji: "❌ ",

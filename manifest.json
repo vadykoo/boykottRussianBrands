@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Boykott russian Brands",
   "version": "1.0",
-  "description": "Mark Russian brands with a emoji.",
+  "description": "Mark Russian brands with an emoji.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -95,9 +95,9 @@
       ],
       "run_at": "document_idle"
     }
-  ],
+  ]
+  ,
   "host_permissions": [
-    "http://*/*",
-    "https://*/*"
+    "*://*.githubusercontent.com/*"
   ]
 }
