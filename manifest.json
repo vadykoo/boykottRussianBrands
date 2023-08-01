@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Boykott russian Brands",
   "version": "1.0",
-  "description": "Mark Ukrainian brands with a Ukrainian flag emoji and Russian brands with a skull emoji.",
+  "description": "MarkRussian brands with a emoji.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
