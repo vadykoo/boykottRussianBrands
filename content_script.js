@@ -58,56 +58,61 @@ function createBrandSpan(match, brandCategory, brand) {
 
   return span;
 }
-
 // Function to add emojis to the text node
 function addEmojisToTextNode(textNode, brandData) {
   if (hasEmoji(textNode)) return;
 
+  const brands = [];
   brandData.forEach((brandCategory) => {
     if (brandCategory.enabled) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            const brandRegex = new RegExp(`(^|[^\\p{L}])(${brandName})($|[^\\p{L}])`, "giu");
-            let match;
-            while ((match = brandRegex.exec(textNode.nodeValue))) {
-              const parent = textNode.parentNode;
-              if (!parent) {
-                // The parent element does not exist, skip this iteration
-                break;
-              }
-
-              const startIndex = match.index + match[1].length;
-              const endIndex = match.index + match[0].length;
-
-              const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, startIndex));
-              const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(endIndex));
-
-              // Check if the parent element still exists before performing insertions
-              if (parent) {
-                parent.insertBefore(preMatchTextNode, textNode);
-                const span = createBrandSpan(match[0], brandCategory, brand);
-                parent.insertBefore(span, textNode);
-
-                // Add a new text node with the remaining text after the inserted emoji
-                const remainingText = textNode.nodeValue.slice(endIndex);
-                if (remainingText) {
-                  const remainingTextNode = document.createTextNode(remainingText);
-                  parent.insertBefore(remainingTextNode, textNode);
-                }
-
-                // Remove the original text node with the matched text and the inserted emoji
-                parent.removeChild(textNode);
-              }
-
-              textNode = postMatchTextNode; // Continue processing the remaining text after the inserted emoji
-              brandRegex.lastIndex = 0; // Reset the regex index for the next iteration
-            }
+            brands.push({ name: brandName, category: brandCategory, brand: brand });
           });
         }
       });
     }
   });
+
+  const brandsRegex = new RegExp(`(^|[^\\p{L}])(${brands.map(brand => brand.name).join('|')})($|[^\\p{L}])`, "giu");
+  let match;
+  while ((match = brandsRegex.exec(textNode.nodeValue))) {
+    const parent = textNode.parentNode;
+    if (!parent) {
+      // The parent element does not exist, skip this iteration
+      break;
+    }
+
+    const startIndex = match.index + match[1].length;
+    const endIndex = match.index + match[0].length;
+
+    const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, startIndex));
+    const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(endIndex));
+
+    // Find the brand and brand category that matches the found brand name
+    const matchedBrand = brands.find(brand => brand.name.toLowerCase() === match[2].toLowerCase());
+
+    // Check if the parent element still exists before performing insertions
+    if (parent && matchedBrand) {
+      parent.insertBefore(preMatchTextNode, textNode);
+      const span = createBrandSpan(match[0], matchedBrand.category, matchedBrand.brand);
+      parent.insertBefore(span, textNode);
+
+      // Add a new text node with the remaining text after the inserted emoji
+      const remainingText = textNode.nodeValue.slice(endIndex);
+      if (remainingText) {
+        const remainingTextNode = document.createTextNode(remainingText);
+        parent.insertBefore(remainingTextNode, textNode);
+      }
+
+      // Remove the original text node with the matched text and the inserted emoji
+      parent.removeChild(textNode);
+    }
+
+    textNode = postMatchTextNode; // Continue processing the remaining text after the inserted emoji
+    brandsRegex.lastIndex = 0; // Reset the regex index for the next iteration
+  }
 }
 
 
