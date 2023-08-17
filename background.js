@@ -71,33 +71,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchBrandDataFromGithub() {
-  return fetch('https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrands.json')
+  return fetch('https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json')
     .then(response => response.json())
     .then(fetchedBrandData => {
       return new Promise((resolve, reject) => {
-        chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
-          if (!brandData) {
-            brandData = defaultBrandData; // Use default brand data if not found in local storage
-          }
-
-          // Update the names in the brandData with the fetched data
-          for (let brandCategory of brandData) {
-            if (fetchedBrandData[brandCategory.name]) {
-              // Assuming brandCategory.names is the array you want to filter
-              const uniqueNames = new Set(brandCategory.names);
-              brandCategory.names = [...uniqueNames];
-              brandCategory.names = fetchedBrandData[brandCategory.name].map(brand => ({
-                names: brand.name, // brand.name is now an array of brand names
-                description: brand.description,
-                linkSource: brand.linkSource
-              }));
+        chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fetchTime }) => {
+          const currentTime = Date.now();
+          if (!brandData || !fetchTime || currentTime - fetchTime > 24 * 60 * 60 * 1000) {
+            // If brandData is not in local storage or it's older than one day, fetch it again
+            if (!brandData) {
+              brandData = defaultBrandData; // Use default brand data if not found in local storage
             }
-          }
 
-          // Save the updated brandData to local storage
-          chrome.storage.local.set({ brandData }, () => {
+            // Update the names in the brandData with the fetched data
+            for (let brandCategory of brandData) {
+              if (fetchedBrandData[brandCategory.name]) {
+                // Assuming brandCategory.names is the array you want to filter
+                const uniqueNames = new Set(brandCategory.names);
+                brandCategory.names = [...uniqueNames];
+                brandCategory.names = fetchedBrandData[brandCategory.name].map(brand => ({
+                  names: brand.name, // brand.name is now an array of brand names
+                  description: brand.description,
+                  linkSource: brand.linkSource
+                }));
+              }
+            }
+
+            // Save the updated brandData to local storage
+            chrome.storage.local.set({ brandData }, () => {
+              resolve(brandData);
+            });
+          } else {
             resolve(brandData);
-          });
+          }
         });
       });
     })

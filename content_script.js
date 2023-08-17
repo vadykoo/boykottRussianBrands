@@ -43,6 +43,7 @@ function createBrandSpan(match, brandCategory, brand) {
   span.style.position = 'relative';
 
   const tooltip = createTooltip(brand);
+  // const tooltip = null;
 
   if (tooltip) {
     span.addEventListener('mouseover', () => {

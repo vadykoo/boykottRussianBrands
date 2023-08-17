@@ -20,9 +20,7 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "storage",
-    "scripting",
-    "activeTab"
+    "storage"
   ],
   "content_scripts": [
     {
@@ -72,6 +70,7 @@
         "*://*.privatmarket.com/*",
         "*://*.athletics.kiev.ua/*",
         "*://*.hotline.ua/*",
+        "*://*.comfy.ua/*",
         "https://megamarket.zakaz.ua/*",
         "https://varus.zakaz.ua/*",
         "https://novus.zakaz.ua/*",

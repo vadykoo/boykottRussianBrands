@@ -50,11 +50,38 @@ const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
 const brandCount = document.getElementById("brandCount");
 
 fetchBrandDataButton.addEventListener("click", () => {
+  chrome.storage.local.remove('brandData', function() {
+    console.log('brandData has been removed from local storage and updated from GitHub');
+  });
+
   chrome.runtime.sendMessage({ action: 'fetchBrandData' }, (response) => {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
     } else {
-      brandCount.textContent = `Number of brands: ${response.brandCount}`;
+      // Force fetch the brand data again and update the brand count
+      chrome.storage.local.set({ fetchTime: null }, () => {
+        brandCount.textContent = `Number of brands on server: ${response.brandCount}`;
+      });
     }
   });
+});
+
+chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fetchTime }) => {
+  if (brandData) {
+    const totalBrandsElement = document.getElementById("totalBrands");
+    const lastUpdatedElement = document.getElementById("lastUpdated");
+
+    // Calculate the total number of brands
+    let totalBrands = 0;
+    brandData.forEach(category => {
+      totalBrands += category.names.length;
+    });
+
+    totalBrandsElement.textContent = `Number of brands in your extension: ${totalBrands}`;
+
+    if (fetchTime) {
+      const lastUpdatedDate = new Date(fetchTime);
+      lastUpdatedElement.textContent = `Last updated: ${lastUpdatedDate.toLocaleString()}`;
+    }
+  }
 });
