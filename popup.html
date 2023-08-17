@@ -8,6 +8,20 @@
       display: block;
       margin-bottom: 8px;
     }
+    /* .circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #6bcdd8;
+  text-align: center;
+} */
   </style>
 </head>
 <body>
@@ -16,12 +30,14 @@
     <!-- Checkbox elements will be dynamically generated here -->
   </form>
 
-  <p id="totalBrands">Number of brands: </p>
-  <p id="lastUpdated">Last updated: </p>
+  <p><span></span><span id="totalBrands" class="circle"></span></p>
+  
+  <!-- <p id="lastUpdated">Last updated: </p> -->
 
   <button id="fetchBrandDataButton">Оновити список брендів/Update list</button>
+  <p id="brandCount"></p>
+  
   <a href="https://forms.gle/oBgNEt5z7QcMbhjd8" target="_blank">Запропонувати бренд чи залишити відгук</a>
-<p id="brandCount"></p>
   <!-- <script src="constants.js"></script> -->
   <script src="popup.js"></script>
 </body>
