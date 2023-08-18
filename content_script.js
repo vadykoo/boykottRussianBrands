@@ -124,21 +124,11 @@ function createTooltip(brand) {
 function createBrandSpan(match, brandCategory, brand) {
   const span = document.createElement('span');
   span.textContent = `${match} ${brandCategory.emoji}`;
-  // span.style.cursor = 'pointer';
   span.style.position = 'relative';
+  span.classList.add('brand-span'); // Add a class to the span for identification
 
-  // const tooltip = createTooltip(brand);
-  const tooltip = null;
-
+  const tooltip = createTooltip(brand);
   if (tooltip) {
-    span.addEventListener('mouseover', () => {
-      tooltip.style.display = 'block';
-    });
-
-    span.addEventListener('mouseout', () => {
-      tooltip.style.display = 'none';
-    });
-
     span.appendChild(tooltip);
   }
 
@@ -159,24 +149,75 @@ function traverseAndAddEmojis(node, brandData) {
 // Retrieve brandData from local storage or use default values
 chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   function processPage() {
-    traverseAndAddEmojis(document.body, brandData);
-
+    let isProcessing = false;
+    let pendingMutations = false;
+  
+    requestIdleCallback(() => {
+      traverseAndAddEmojis(document.body, brandData);
+    });
+  
     const observer = new MutationObserver((mutationsList) => {
+      if (isProcessing) {
+        pendingMutations = true;
+        return;
+      }
+  
+      isProcessing = true;
+  
       mutationsList.forEach((mutation) => {
         if (mutation.type === "childList") {
           mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.TEXT_NODE) {
-              addEmojisToTextNode(node, brandData);
-            } else if (node.nodeType === Node.ELEMENT_NODE) {
-              traverseAndAddEmojis(node, brandData);
-            }
+            requestIdleCallback(() => {
+              if (node.nodeType === Node.TEXT_NODE) {
+                addEmojisToTextNode(node, brandData);
+              } else if (node.nodeType === Node.ELEMENT_NODE) {
+                traverseAndAddEmojis(node, brandData);
+              }
+            });
           });
         }
       });
+  
+      isProcessing = false;
+  
+      if (pendingMutations) {
+        pendingMutations = false;
+        observer.takeRecords().forEach(mutation => {
+          if (mutation.type === "childList") {
+            mutation.addedNodes.forEach((node) => {
+              requestIdleCallback(() => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                  addEmojisToTextNode(node, brandData);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                  traverseAndAddEmojis(node, brandData);
+                }
+              });
+            });
+          }
+        });
+      }
     });
-
+  
     observer.observe(document, { childList: true, subtree: true });
   }
 
   window.addEventListener("load", processPage);
+});
+
+document.body.addEventListener('mouseover', (event) => {
+  if (event.target.classList.contains('brand-span')) {
+    const tooltip = event.target.querySelector('div');
+    if (tooltip) {
+      tooltip.style.display = 'block';
+    }
+  }
+});
+
+document.body.addEventListener('mouseout', (event) => {
+  if (event.target.classList.contains('brand-span')) {
+    const tooltip = event.target.querySelector('div');
+    if (tooltip) {
+      tooltip.style.display = 'none';
+    }
+  }
 });
