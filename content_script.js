@@ -1,3 +1,88 @@
+class TrieNode {
+  constructor() {
+    this.children = {};
+    this.endOfWord = null;
+  }
+}
+
+class Trie {
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  insert(word, brand) {
+    let node = this.root;
+    for (let char of word) {
+      if (!node.children[char]) {
+        node.children[char] = new TrieNode();
+      }
+      node = node.children[char];
+    }
+    node.endOfWord = brand;
+  }
+
+  search(word) {
+    let node = this.root;
+    for (let char of word) {
+      if (!node.children[char]) {
+        return null;
+      }
+      node = node.children[char];
+    }
+    return node.endOfWord;
+  }
+}
+
+function addEmojisToTextNode(textNode, brandData) {
+  if (hasEmoji(textNode)) return;
+
+  const trie = new Trie();
+  brandData.forEach((brandCategory) => {
+    if (brandCategory.enabled) {
+      brandCategory.names.forEach((brand) => {
+        if (brand.names) {
+          brand.names.forEach((brandName) => {
+            trie.insert(brandName.toLowerCase(), { name: brandName, category: brandCategory, brand: brand });
+          });
+        }
+      });
+    }
+  });
+
+  const words = textNode.nodeValue.split(' ');
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const matchedBrand = trie.search(word.toLowerCase());
+    if (matchedBrand) {
+      const parent = textNode.parentNode;
+      if (!parent) {
+        break;
+      }
+
+      const wordIndex = textNode.nodeValue.indexOf(word);
+      const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
+      const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + word.length));
+
+      if (parent && matchedBrand) {
+        parent.insertBefore(preMatchTextNode, textNode);
+        const span = createBrandSpan(word, matchedBrand.category, matchedBrand.brand);
+        parent.insertBefore(span, textNode);
+
+        const remainingText = textNode.nodeValue.slice(wordIndex + word.length);
+        if (remainingText) {
+          const remainingTextNode = document.createTextNode(remainingText);
+          parent.insertBefore(remainingTextNode, textNode);
+        }
+
+        parent.removeChild(textNode);
+      }
+
+      textNode = postMatchTextNode;
+    }
+  }
+}
+
+
 // Function to check if the text node already contains an emoji
 function hasEmoji(textNode) {
   const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
@@ -59,65 +144,6 @@ function createBrandSpan(match, brandCategory, brand) {
 
   return span;
 }
-// Function to add emojis to the text node
-function addEmojisToTextNode(textNode, brandData) {
-  if (hasEmoji(textNode)) return;
-
-  const brands = [];
-  brandData.forEach((brandCategory) => {
-    if (brandCategory.enabled) {
-      brandCategory.names.forEach((brand) => {
-        if (brand.names) {
-          brand.names.forEach((brandName) => {
-            brands.push({ name: brandName, category: brandCategory, brand: brand });
-          });
-        }
-      });
-    }
-  });
-
-  const brandsRegex = new RegExp(`(^|[^\\p{L}])(${brands.map(brand => brand.name).join('|')})($|[^\\p{L}])`, "giu");
-  let match;
-  while ((match = brandsRegex.exec(textNode.nodeValue))) {
-    const parent = textNode.parentNode;
-    if (!parent) {
-      // The parent element does not exist, skip this iteration
-      break;
-    }
-
-    const startIndex = match.index + match[1].length;
-    const endIndex = match.index + match[0].length;
-
-    const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, startIndex));
-    const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(endIndex));
-
-    // Find the brand and brand category that matches the found brand name
-    const matchedBrand = brands.find(brand => brand.name.toLowerCase() === match[2].toLowerCase());
-
-    // Check if the parent element still exists before performing insertions
-    if (parent && matchedBrand) {
-      parent.insertBefore(preMatchTextNode, textNode);
-      const span = createBrandSpan(match[0], matchedBrand.category, matchedBrand.brand);
-      parent.insertBefore(span, textNode);
-
-      // Add a new text node with the remaining text after the inserted emoji
-      const remainingText = textNode.nodeValue.slice(endIndex);
-      if (remainingText) {
-        const remainingTextNode = document.createTextNode(remainingText);
-        parent.insertBefore(remainingTextNode, textNode);
-      }
-
-      // Remove the original text node with the matched text and the inserted emoji
-      parent.removeChild(textNode);
-    }
-
-    textNode = postMatchTextNode; // Continue processing the remaining text after the inserted emoji
-    brandsRegex.lastIndex = 0; // Reset the regex index for the next iteration
-  }
-}
-
-
-
 
 // Function to traverse and add emojis to all text nodes on the page
 function traverseAndAddEmojis(node, brandData) {
