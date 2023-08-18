@@ -141,9 +141,15 @@ function traverseAndAddEmojis(node, brandData) {
   if (node.nodeType === Node.TEXT_NODE) {
     addEmojisToTextNode(node, brandData);
   } else if (node.nodeType === Node.ELEMENT_NODE) {
-    node.childNodes.forEach((childNode) => {
-      traverseAndAddEmojis(childNode, brandData);
-    });
+    let i = 0;
+    function processNextChild() {
+      if (i < node.childNodes.length) {
+        traverseAndAddEmojis(node.childNodes[i], brandData);
+        i++;
+        processNextChild();
+      }
+    }
+    requestIdleCallback(processNextChild);
   }
 }
 
@@ -174,13 +180,11 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
       mutationsList.forEach((mutation) => {
         if (mutation.type === "childList") {
           mutation.addedNodes.forEach((node) => {
-            requestIdleCallback(() => {
               if (node.nodeType === Node.TEXT_NODE) {
                 addEmojisToTextNode(node, brandData);
               } else if (node.nodeType === Node.ELEMENT_NODE) {
                 traverseAndAddEmojis(node, brandData);
               }
-            });
           });
         }
       });
@@ -192,13 +196,11 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
         observer.takeRecords().forEach(mutation => {
           if (mutation.type === "childList") {
             mutation.addedNodes.forEach((node) => {
-              requestIdleCallback(() => {
                 if (node.nodeType === Node.TEXT_NODE) {
                   addEmojisToTextNode(node, brandData);
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
                   traverseAndAddEmojis(node, brandData);
                 }
-              });
             });
           }
         });
