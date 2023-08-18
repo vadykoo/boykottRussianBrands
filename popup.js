@@ -77,7 +77,7 @@ chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fet
       totalBrands += category.names.length;
     });
 
-    totalBrandsElement.textContent = `Number of brands in your extension: ${totalBrands}`;
+    document.getElementById('totalBrands').textContent = totalBrands;
 
     if (fetchTime) {
       const lastUpdatedDate = new Date(fetchTime);
