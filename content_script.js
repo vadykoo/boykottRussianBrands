@@ -95,10 +95,10 @@ function createTooltip(brand) {
   if (!brand.description || !brand.linkSource) {
     return null;
   }
-
   const tooltip = document.createElement('div');
+  tooltip.style.all = 'initial'; // Reset all inherited styles
   tooltip.style.display = 'none';
-  tooltip.style.position = 'absolute';
+  tooltip.style.position = 'fixed'; // Change this line
   tooltip.style.top = '100%';
   tooltip.style.left = '0';
   tooltip.style.width = '240px';
@@ -118,6 +118,30 @@ function createTooltip(brand) {
   }
   tooltip.innerHTML = tooltipHTML;
 
+  tooltip.classList.add('brand-tooltip'); // Add a class to the tooltip
+
+
+   // Create a close button
+   const closeButton = document.createElement('button');
+   closeButton.textContent = 'X';
+   closeButton.style.position = 'absolute';
+   closeButton.style.top = '0';
+   closeButton.style.right = '0';
+   closeButton.style.background = 'none';
+   closeButton.style.border = 'none';
+   closeButton.style.fontSize = '16px';
+   closeButton.style.cursor = 'pointer';
+ 
+   // Add an event listener to the close button to hide the tooltip when clicked
+   closeButton.addEventListener('click', (event) => {
+     event.stopPropagation();
+     tooltip.style.display = 'none';
+   });
+ 
+   // Add the close button to the tooltip
+   tooltip.appendChild(closeButton);
+   
+
   return tooltip;
 }
 
@@ -127,11 +151,7 @@ function createBrandSpan(match, brandCategory, brand) {
   span.textContent = `${match} ${brandCategory.emoji}`;
   span.style.position = 'relative';
   span.classList.add('brand-span'); // Add a class to the span for identification
-
-  const tooltip = createTooltip(brand);
-  if (tooltip) {
-    span.appendChild(tooltip);
-  }
+  span.dataset.brand = JSON.stringify(brand); // Store the brand data in the dataset
 
   return span;
 }
@@ -222,8 +242,22 @@ let hideTooltipTimeout;
 
 document.body.addEventListener('mouseover', (event) => {
   if (event.target.classList.contains('brand-span')) {
-    const tooltip = event.target.querySelector('div');
+    // Check if a tooltip is already displayed
+    const existingTooltip = event.target.querySelector('div');
+    if (existingTooltip && existingTooltip.style.display === 'block') {
+      return;
+    }
+
+    // If not, create a new tooltip
+    const brand = JSON.parse(event.target.dataset.brand);
+    const tooltip = createTooltip(brand);
     if (tooltip) {
+      // Calculate the position of the tooltip
+      const rect = event.target.getBoundingClientRect();
+      tooltip.style.left = `${rect.left}px`;
+      tooltip.style.top = `${rect.bottom}px`;
+
+      event.target.appendChild(tooltip);
       clearTimeout(hideTooltipTimeout);
       tooltip.style.display = 'block';
     }
