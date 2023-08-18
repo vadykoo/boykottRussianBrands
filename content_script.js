@@ -218,10 +218,13 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   window.addEventListener("popstate", processPage);
 });
 
+let hideTooltipTimeout;
+
 document.body.addEventListener('mouseover', (event) => {
   if (event.target.classList.contains('brand-span')) {
     const tooltip = event.target.querySelector('div');
     if (tooltip) {
+      clearTimeout(hideTooltipTimeout);
       tooltip.style.display = 'block';
     }
   }
@@ -231,7 +234,23 @@ document.body.addEventListener('mouseout', (event) => {
   if (event.target.classList.contains('brand-span')) {
     const tooltip = event.target.querySelector('div');
     if (tooltip) {
-      tooltip.style.display = 'none';
+      hideTooltipTimeout = setTimeout(() => {
+        tooltip.style.display = 'none';
+      }, 500); // 500ms delay before hiding the tooltip
     }
+  }
+});
+
+document.body.addEventListener('mouseover', (event) => {
+  if (event.target.parentElement && event.target.parentElement.classList.contains('brand-span')) {
+    clearTimeout(hideTooltipTimeout);
+  }
+});
+
+document.body.addEventListener('mouseout', (event) => {
+  if (event.target.parentElement && event.target.parentElement.classList.contains('brand-span')) {
+    hideTooltipTimeout = setTimeout(() => {
+      event.target.style.display = 'none';
+    }, 500); // 500ms delay before hiding the tooltip
   }
 });
