@@ -1,3 +1,4 @@
+let observer;
 class TrieNode {
   constructor() {
     this.children = {};
@@ -148,7 +149,13 @@ function traverseAndAddEmojis(node, brandData) {
 
 // Retrieve brandData from local storage or use default values
 chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+  let observer;
   function processPage() {
+
+    // Disconnect the old observer, if it exists
+  if (observer) {
+    observer.disconnect();
+  }
     let isProcessing = false;
     let pendingMutations = false;
   
@@ -156,7 +163,7 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
       traverseAndAddEmojis(document.body, brandData);
     });
   
-    const observer = new MutationObserver((mutationsList) => {
+    observer = new 2((mutationsList) => {
       if (isProcessing) {
         pendingMutations = true;
         return;
@@ -201,7 +208,12 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
     observer.observe(document, { childList: true, subtree: true });
   }
 
+  // Call processPage when the page loads
   window.addEventListener("load", processPage);
+
+  // Also call processPage when the URL changes
+  window.addEventListener("hashchange", processPage);
+  window.addEventListener("popstate", processPage);
 });
 
 document.body.addEventListener('mouseover', (event) => {
