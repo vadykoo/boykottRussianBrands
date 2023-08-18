@@ -163,7 +163,7 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
       traverseAndAddEmojis(document.body, brandData);
     });
   
-    observer = new 2((mutationsList) => {
+    observer = new MutationObserver((mutationsList) => {
       if (isProcessing) {
         pendingMutations = true;
         return;
