@@ -174,7 +174,13 @@ function traverseAndAddEmojis(node, brandData) {
 }
 
 // Retrieve brandData from local storage or use default values
-chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+chrome.storage.local.get({ brandData: null, extensionEnabled: true }, ({ brandData, extensionEnabled }) => {
+
+  if (!extensionEnabled) {
+    console.log('Extension is disabled');
+    return;
+  }
+
   let observer;
   function processPage() {
 

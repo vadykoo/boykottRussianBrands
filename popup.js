@@ -85,3 +85,25 @@ chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fet
     }
   }
 });
+
+
+const toggleExtensionButton = document.getElementById("toggleExtension");
+
+function updateToggleButton() {
+  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
+    toggleExtensionButton.textContent = extensionEnabled ? 'ON' : 'OFF';
+  });
+}
+
+toggleExtensionButton.addEventListener("click", () => {
+  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
+    // Toggle the extensionEnabled value
+    chrome.storage.local.set({ extensionEnabled: !extensionEnabled }, () => {
+      console.log(`Extension toggled: ${!extensionEnabled}`);
+      updateToggleButton();
+    });
+  });
+});
+
+// Update the button text when the popup is opened
+updateToggleButton();
