@@ -1,55 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Russian Brands Marker</title>
-  <style>
-    body {
-      background-color: lightblue;
-    }
-    button {
-      background-color: white;
-      border: 2px solid black;
-      color: black;
-      padding: 10px 24px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;
-    }
-    #totalBrands {
-      display: inline-block;
-      border: 2px solid black;
-      border-radius: 50%;
-      padding: 10px;
-      background-color: white;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Налаштування/Settings</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Russian Brands Marker</title>
+    <style>
+      body {
+        background-color: lightblue;
+      }
+      button {
+        background-color: white;
+        border: 2px solid black;
+        color: black;
+        padding: 10px 24px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      #totalBrands {
+        display: inline-block;
+        border: 2px solid black;
+        border-radius: 50%;
+        padding: 10px;
+        background-color: white;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Налаштування/Settings</h1>
 
-  <button id="toggleExtension">Toggle Extension</button>
+    <button id="toggleExtension">Toggle Extension</button>
 
-  <form id="brandForm">
-    <!-- Checkbox elements will be dynamically generated here -->
-  </form>
+    <form id="brandForm">
+      <!-- Checkbox elements will be dynamically generated here -->
+    </form>
 
-  <p id="brandText"><span>Number of brands: </span><span id="totalBrands" class="circle"></span></p>
-  
-  <!-- <p id="lastUpdated">Last updated: </p> -->
+    <p id="brandText">
+      <span>Number of brands: </span
+      ><span id="totalBrands" class="circle"></span>
+    </p>
 
-  <button id="fetchBrandDataButton">Оновити список брендів/Update list</button>
-  <p id="brandCount"></p>
-  
-  <a href="https://forms.gle/oBgNEt5z7QcMbhjd8" target="_blank">Запропонувати бренд чи залишити відгук</a>
-  <!-- <script src="constants.js"></script> -->
-  <script src="popup.js"></script>
-</body>
+    <!-- <p id="lastUpdated">Last updated: </p> -->
+
+    <button id="fetchBrandDataButton">
+      Оновити список брендів/Update list
+    </button>
+    <p id="brandCount"></p>
+
+    <a href="https://forms.gle/oBgNEt5z7QcMbhjd8" target="_blank"
+      >Запропонувати бренд чи залишити відгук</a
+    >
+
+    <!-- Custom Brands Section -->
+    <h2>Add Custom Brands</h2>
+    <input type="text" id="customBrandInput" placeholder="Enter custom brand" />
+    <button id="addCustomBrandButton">Add Custom Brand</button>
+
+    <!-- <script src="constants.js"></script> -->
+    <script src="popup.js"></script>
+  </body>
 </html>
