@@ -43,7 +43,13 @@ function addEmojisToTextNode(textNode, brandData) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            trie.insert(brandName.toLowerCase(), { name: brandName, category: brandCategory, brand: brand });
+            // Split brand name into words
+            const brandWords = brandName.toLowerCase().split(' ');
+
+            // Insert each word into the trie
+            brandWords.forEach((word) => {
+              trie.insert(word, { name: brandName, category: brandCategory, brand: brand });
+            });
           });
         }
       });
@@ -51,38 +57,44 @@ function addEmojisToTextNode(textNode, brandData) {
   });
 
   const words = textNode.nodeValue.split(' ');
+  let matchedBrandWords = [];
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
     const matchedBrand = trie.search(word.toLowerCase());
     if (matchedBrand) {
-      const parent = textNode.parentNode;
-      if (!parent) {
-        break;
-      }
-
-      const wordIndex = textNode.nodeValue.indexOf(word);
-      const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
-      const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + word.length));
-
-      if (parent && matchedBrand) {
-        parent.insertBefore(preMatchTextNode, textNode);
-        const span = createBrandSpan(word, matchedBrand.category, matchedBrand.brand);
-        parent.insertBefore(span, textNode);
-
-        const remainingText = textNode.nodeValue.slice(wordIndex + word.length);
-        if (remainingText) {
-          const remainingTextNode = document.createTextNode(remainingText);
-          parent.insertBefore(remainingTextNode, textNode);
+      matchedBrandWords.push(word);
+      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name.toLowerCase()) {
+        const parent = textNode.parentNode;
+        if (!parent) {
+          break;
         }
 
-        parent.removeChild(textNode);
-      }
+        const wordIndex = textNode.nodeValue.indexOf(matchedBrandWords.join(' '));
+        const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
+        const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length));
 
-      textNode = postMatchTextNode;
+        if (parent && matchedBrand) {
+          parent.insertBefore(preMatchTextNode, textNode);
+          const span = createBrandSpan(matchedBrandWords.join(' '), matchedBrand.category, matchedBrand.brand);
+          parent.insertBefore(span, textNode);
+
+          const remainingText = textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length);
+          if (remainingText) {
+            const remainingTextNode = document.createTextNode(remainingText);
+            parent.insertBefore(remainingTextNode, textNode);
+          }
+
+          parent.removeChild(textNode);
+        }
+
+        textNode = postMatchTextNode;
+        matchedBrandWords = [];
+      }
+    } else {
+      matchedBrandWords = [];
     }
   }
 }
-
 
 // Function to check if the text node already contains an emoji
 function hasEmoji(textNode) {
@@ -245,6 +257,56 @@ chrome.storage.local.get({ brandData: null, extensionEnabled: true }, ({ brandDa
 });
 
 let hideTooltipTimeout;
+function addTooltipEventListeners(tooltip, brandSpan) {
+  let isTooltipHovered = false;
+  let isBrandSpanHovered = false;
+
+  // Mouseover event listener for the tooltip
+  tooltip.addEventListener('mouseover', () => {
+    isTooltipHovered = true;
+    clearTimeout(hideTooltipTimeout); // Cancel the tooltip hide timeout
+  });
+
+  // Mouseout event listener for the tooltip
+  tooltip.addEventListener('mouseout', () => {
+    isTooltipHovered = false;
+    checkAndHideTooltip();
+  });
+
+  // Mouseover event listener for the brand span
+  brandSpan.addEventListener('mouseover', () => {
+    isBrandSpanHovered = true;
+    clearTimeout(hideTooltipTimeout); // Cancel the tooltip hide timeout
+  });
+
+  // Mouseout event listener for the brand span
+  brandSpan.addEventListener('mouseout', () => {
+    isBrandSpanHovered = false;
+    checkAndHideTooltip();
+  });
+
+  // Prevent click events from propagating to underlying elements
+  tooltip.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+
+  // Add click event listener to open the link in a new tab/window
+  const link = tooltip.querySelector('a');
+  if (link) {
+    link.addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent click event from reaching underlying elements
+      window.open(link.href, '_blank'); // Open the link in a new tab/window
+    });
+  }
+
+  function checkAndHideTooltip() {
+    if (!isTooltipHovered && !isBrandSpanHovered) {
+      hideTooltipTimeout = setTimeout(() => {
+        tooltip.style.display = 'none';
+      }, 500); // 500ms delay before hiding the tooltip
+    }
+  }
+}
 
 document.body.addEventListener('mouseover', (event) => {
   if (event.target.classList.contains('brand-span')) {
@@ -264,33 +326,9 @@ document.body.addEventListener('mouseover', (event) => {
       tooltip.style.top = `${rect.bottom}px`;
 
       event.target.appendChild(tooltip);
+      addTooltipEventListeners(tooltip, event.target); // Add event listeners to the tooltip and brand span
       clearTimeout(hideTooltipTimeout);
       tooltip.style.display = 'block';
     }
-  }
-});
-
-document.body.addEventListener('mouseout', (event) => {
-  if (event.target.classList.contains('brand-span')) {
-    const tooltip = event.target.querySelector('div');
-    if (tooltip) {
-      hideTooltipTimeout = setTimeout(() => {
-        tooltip.style.display = 'none';
-      }, 500); // 500ms delay before hiding the tooltip
-    }
-  }
-});
-
-document.body.addEventListener('mouseover', (event) => {
-  if (event.target.parentElement && event.target.parentElement.classList.contains('brand-span')) {
-    clearTimeout(hideTooltipTimeout);
-  }
-});
-
-document.body.addEventListener('mouseout', (event) => {
-  if (event.target.parentElement && event.target.parentElement.classList.contains('brand-span')) {
-    hideTooltipTimeout = setTimeout(() => {
-      event.target.style.display = 'none';
-    }, 500); // 500ms delay before hiding the tooltip
   }
 });
