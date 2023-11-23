@@ -42,7 +42,52 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
 
 // Send a message to the background script when the popup is opened
 document.addEventListener("DOMContentLoaded", () => {
+    // Update the list of custom brands in the popup
+  function updateCustomBrandsList(customBrands) {
+    const customBrandsUl = document.getElementById("customBrandsUl");
+    customBrandsUl.innerHTML = ""; // Clear the existing list
+
+    customBrands.forEach((customBrand) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = customBrand.name;
+      customBrandsUl.appendChild(listItem);
+    });
+  }
+
   chrome.runtime.sendMessage({ action: "fetchBrandData" });
+
+
+
+    // Add event listener to update the list of custom brands
+    const addCustomBrandButton = document.getElementById("addCustomBrandButton");
+    addCustomBrandButton.addEventListener("click", () => {
+      const customBrandInput = document.getElementById("customBrandInput");
+      const customBrand = customBrandInput.value.trim();
+      if (customBrand) {
+        chrome.runtime.sendMessage(
+          { action: "addCustomBrand", brand: customBrand.toLowerCase() },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.error(chrome.runtime.lastError.message);
+            } else {
+              console.log(`Custom brand '${customBrand}' added`);
+              customBrandInput.value = "";
+  
+              // Update the list of custom brands
+              chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
+                updateCustomBrandsList(customBrands);
+              });
+            }
+          }
+        );
+      }
+    });
+  
+    chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
+      updateCustomBrandsList(customBrands);
+    });
+
+
 });
 
 const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
@@ -116,22 +161,3 @@ toggleExtensionButton.addEventListener("click", () => {
 
 // Update the button text when the popup is opened
 updateToggleButton();
-const addCustomBrandButton = document.getElementById("addCustomBrandButton");
-const customBrandInput = document.getElementById("customBrandInput");
-
-addCustomBrandButton.addEventListener("click", () => {
-  const customBrand = customBrandInput.value.trim();
-  if (customBrand) {
-    chrome.runtime.sendMessage(
-      { action: "addCustomBrand", brand: customBrand },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError.message);
-        } else {
-          console.log(`Custom brand '${customBrand}' added`);
-          customBrandInput.value = "";
-        }
-      },
-    );
-  }
-});

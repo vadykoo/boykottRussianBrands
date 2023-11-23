@@ -12,6 +12,10 @@ class Trie {
   }
 
   insert(word, brand) {
+    if (typeof word !== 'string') {
+      return null;
+    }
+
     let node = this.root;
     for (let char of word) {
       if (!node.children[char]) {

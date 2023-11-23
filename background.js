@@ -20,6 +20,13 @@ const defaultBrandData = [
   // Add more brand categories and their corresponding emojis here
 ];
 
+const defaultCustomBrands = {
+  name: "Custom Brands",
+  enabled: true,
+  names: [], // Custom brands will be added here
+  emoji: "🚩",
+};
+
 function saveDefaultBrandDataToStorage() {
   chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
     if (!brandData) {
@@ -43,6 +50,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true; // Indicate that the response will be sent asynchronously
   }
+
+
+  if (message.action === "addCustomBrand") {
+    const customBrand = {
+      name: message.brand,
+      enabled: true,
+      emoji: "🚩",
+    };
+
+    chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
+      customBrands.push(customBrand);
+
+      chrome.storage.local.set({ customBrands }, () => {
+        sendResponse({ success: true });
+      });
+    });
+  }
+
   // Check if the message is from the popup
   if (sender.tab === undefined) {
     // Save the updated brandData to local storage
@@ -97,15 +122,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchBrandDataFromGithub() {
-  return fetch(
-    "https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json",
-  )
+  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json")
     .then((response) => response.json())
     .then((fetchedBrandData) => {
       return new Promise((resolve, reject) => {
         chrome.storage.local.get(
-          { brandData: null, fetchTime: null },
-          ({ brandData, fetchTime }) => {
+          { brandData: null, fetchTime: null, customBrands: [] },
+          ({ brandData, fetchTime, customBrands }) => {
             const currentTime = Date.now();
             if (
               !brandData ||
@@ -131,6 +154,32 @@ function fetchBrandDataFromGithub() {
                     linkSource: brand.linkSource,
                   }));
                 }
+              }
+
+              // Check for duplicates before appending custom brands
+              const customBrandCategory = brandData.find(
+                (category) => category.name === "Custom Brands"
+              );
+
+              const existingCustomBrandNames = customBrandCategory
+                ? customBrandCategory.names.map((brand) => brand.name)
+                : [];
+
+              // Append only those custom brands that don't already exist
+              const newCustomBrands = customBrands.filter(
+                (customBrand) =>
+                  !existingCustomBrandNames.includes(customBrand.name)
+              );
+
+              if (newCustomBrands.length > 0) {
+                // Append new custom brands to the "Custom Brands" category
+                if (!customBrandCategory) {
+                  brandData.push(defaultCustomBrands);
+                }
+
+                brandData
+                  .find((category) => category.name === "Custom Brands")
+                  .names.push(...newCustomBrands);
               }
 
               // Save the updated brandData to local storage
