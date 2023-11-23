@@ -40,21 +40,22 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   });
 });
 
-
 // Send a message to the background script when the popup is opened
-document.addEventListener('DOMContentLoaded', () => {
-  chrome.runtime.sendMessage({ action: 'fetchBrandData' });
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.runtime.sendMessage({ action: "fetchBrandData" });
 });
 
 const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
 const brandCount = document.getElementById("brandCount");
 
 fetchBrandDataButton.addEventListener("click", () => {
-  chrome.storage.local.remove('brandData', function() {
-    console.log('brandData has been removed from local storage and updated from GitHub');
+  chrome.storage.local.remove("brandData", function () {
+    console.log(
+      "brandData has been removed from local storage and updated from GitHub",
+    );
   });
 
-  chrome.runtime.sendMessage({ action: 'fetchBrandData' }, (response) => {
+  chrome.runtime.sendMessage({ action: "fetchBrandData" }, (response) => {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
     } else {
@@ -66,43 +67,51 @@ fetchBrandDataButton.addEventListener("click", () => {
   });
 });
 
-chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fetchTime }) => {
-  if (brandData) {
-    const totalBrandsElement = document.getElementById("totalBrands");
-    const lastUpdatedElement = document.getElementById("lastUpdated");
+chrome.storage.local.get(
+  { brandData: null, fetchTime: null },
+  ({ brandData, fetchTime }) => {
+    if (brandData) {
+      const totalBrandsElement = document.getElementById("totalBrands");
+      const lastUpdatedElement = document.getElementById("lastUpdated");
 
-    // Calculate the total number of brands
-    let totalBrands = 0;
-    brandData.forEach(category => {
-      totalBrands += category.names.length;
-    });
+      // Calculate the total number of brands
+      let totalBrands = 0;
+      brandData.forEach((category) => {
+        totalBrands += category.names.length;
+      });
 
-    document.getElementById('totalBrands').textContent = totalBrands;
+      document.getElementById("totalBrands").textContent = totalBrands;
 
-    if (fetchTime) {
-      const lastUpdatedDate = new Date(fetchTime);
-      lastUpdatedElement.textContent = `Last updated: ${lastUpdatedDate.toLocaleString()}`;
+      if (fetchTime) {
+        const lastUpdatedDate = new Date(fetchTime);
+        lastUpdatedElement.textContent = `Last updated: ${lastUpdatedDate.toLocaleString()}`;
+      }
     }
-  }
-});
-
+  },
+);
 
 const toggleExtensionButton = document.getElementById("toggleExtension");
 
 function updateToggleButton() {
-  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
-    toggleExtensionButton.textContent = extensionEnabled ? 'ON' : 'OFF';
-  });
+  chrome.storage.local.get(
+    { extensionEnabled: true },
+    ({ extensionEnabled }) => {
+      toggleExtensionButton.textContent = extensionEnabled ? "ON" : "OFF";
+    },
+  );
 }
 
 toggleExtensionButton.addEventListener("click", () => {
-  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
-    // Toggle the extensionEnabled value
-    chrome.storage.local.set({ extensionEnabled: !extensionEnabled }, () => {
-      console.log(`Extension toggled: ${!extensionEnabled}`);
-      updateToggleButton();
-    });
-  });
+  chrome.storage.local.get(
+    { extensionEnabled: true },
+    ({ extensionEnabled }) => {
+      // Toggle the extensionEnabled value
+      chrome.storage.local.set({ extensionEnabled: !extensionEnabled }, () => {
+        console.log(`Extension toggled: ${!extensionEnabled}`);
+        updateToggleButton();
+      });
+    },
+  );
 });
 
 // Update the button text when the popup is opened
@@ -113,13 +122,16 @@ const customBrandInput = document.getElementById("customBrandInput");
 addCustomBrandButton.addEventListener("click", () => {
   const customBrand = customBrandInput.value.trim();
   if (customBrand) {
-    chrome.runtime.sendMessage({ action: 'addCustomBrand', brand: customBrand }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
-      } else {
-        console.log(`Custom brand '${customBrand}' added`);
-        customBrandInput.value = '';
-      }
-    });
+    chrome.runtime.sendMessage(
+      { action: "addCustomBrand", brand: customBrand },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError.message);
+        } else {
+          console.log(`Custom brand '${customBrand}' added`);
+          customBrandInput.value = "";
+        }
+      },
+    );
   }
 });
