@@ -48,18 +48,22 @@ document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(
     [window.location.href, "globalBrandCounter"],
     ({ [window.location.href]: pageCounter, globalBrandCounter }) => {
+      // Check if pageCounter and globalBrandCounter are null and if so, set them to 0
+      if (pageCounter === null) {
+        pageCounter = 0;
+      }
+      if (globalBrandCounter === null) {
+        globalBrandCounter = 0;
+      }
+
       // Create a new element to display the counter for the current page
       const pageCounterElement = document.createElement("p");
-      pageCounterElement.textContent = `Number of brands on this page: ${
-        pageCounter || 0
-      }`;
+      pageCounterElement.textContent = `Number of brands on this page: ${pageCounter}`;
       document.body.appendChild(pageCounterElement);
 
       // Create a new element to display the global counter
       const globalCounterElement = document.createElement("p");
-      globalCounterElement.textContent = `Total number of brands found: ${
-        globalBrandCounter || 0
-      }`;
+      globalCounterElement.textContent = `Total number of brands found: ${globalBrandCounter}`;
       document.body.appendChild(globalCounterElement);
     },
   );
