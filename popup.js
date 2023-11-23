@@ -40,21 +40,46 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   });
 });
 
-
 // Send a message to the background script when the popup is opened
-document.addEventListener('DOMContentLoaded', () => {
-  chrome.runtime.sendMessage({ action: 'fetchBrandData' });
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.runtime.sendMessage({ action: "fetchBrandData" });
+
+  // Retrieve the counter for the current page from the Chrome storage
+  chrome.storage.local.get(
+    [window.location.href, "globalBrandCounter"],
+    ({ [window.location.href]: pageCounter, globalBrandCounter }) => {
+      // Check if pageCounter and globalBrandCounter are null and if so, set them to 0
+      if (pageCounter === null) {
+        pageCounter = 0;
+      }
+      if (globalBrandCounter === null) {
+        globalBrandCounter = 0;
+      }
+
+      // Create a new element to display the counter for the current page
+      const pageCounterElement = document.createElement("p");
+      pageCounterElement.textContent = `Number of brands on this page: ${pageCounter}`;
+      document.body.appendChild(pageCounterElement);
+
+      // Create a new element to display the global counter
+      const globalCounterElement = document.createElement("p");
+      globalCounterElement.textContent = `Total number of brands found: ${globalBrandCounter}`;
+      document.body.appendChild(globalCounterElement);
+    },
+  );
 });
 
 const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
 const brandCount = document.getElementById("brandCount");
 
 fetchBrandDataButton.addEventListener("click", () => {
-  chrome.storage.local.remove('brandData', function() {
-    console.log('brandData has been removed from local storage and updated from GitHub');
+  chrome.storage.local.remove("brandData", function () {
+    console.log(
+      "brandData has been removed from local storage and updated from GitHub",
+    );
   });
 
-  chrome.runtime.sendMessage({ action: 'fetchBrandData' }, (response) => {
+  chrome.runtime.sendMessage({ action: "fetchBrandData" }, (response) => {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
     } else {
@@ -66,43 +91,51 @@ fetchBrandDataButton.addEventListener("click", () => {
   });
 });
 
-chrome.storage.local.get({ brandData: null, fetchTime: null }, ({ brandData, fetchTime }) => {
-  if (brandData) {
-    const totalBrandsElement = document.getElementById("totalBrands");
-    const lastUpdatedElement = document.getElementById("lastUpdated");
+chrome.storage.local.get(
+  { brandData: null, fetchTime: null },
+  ({ brandData, fetchTime }) => {
+    if (brandData) {
+      const totalBrandsElement = document.getElementById("totalBrands");
+      const lastUpdatedElement = document.getElementById("lastUpdated");
 
-    // Calculate the total number of brands
-    let totalBrands = 0;
-    brandData.forEach(category => {
-      totalBrands += category.names.length;
-    });
+      // Calculate the total number of brands
+      let totalBrands = 0;
+      brandData.forEach((category) => {
+        totalBrands += category.names.length;
+      });
 
-    document.getElementById('totalBrands').textContent = totalBrands;
+      document.getElementById("totalBrands").textContent = totalBrands;
 
-    if (fetchTime) {
-      const lastUpdatedDate = new Date(fetchTime);
-      lastUpdatedElement.textContent = `Last updated: ${lastUpdatedDate.toLocaleString()}`;
+      if (fetchTime) {
+        const lastUpdatedDate = new Date(fetchTime);
+        lastUpdatedElement.textContent = `Last updated: ${lastUpdatedDate.toLocaleString()}`;
+      }
     }
-  }
-});
-
+  },
+);
 
 const toggleExtensionButton = document.getElementById("toggleExtension");
 
 function updateToggleButton() {
-  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
-    toggleExtensionButton.textContent = extensionEnabled ? 'ON' : 'OFF';
-  });
+  chrome.storage.local.get(
+    { extensionEnabled: true },
+    ({ extensionEnabled }) => {
+      toggleExtensionButton.textContent = extensionEnabled ? "ON" : "OFF";
+    },
+  );
 }
 
 toggleExtensionButton.addEventListener("click", () => {
-  chrome.storage.local.get({ extensionEnabled: true }, ({ extensionEnabled }) => {
-    // Toggle the extensionEnabled value
-    chrome.storage.local.set({ extensionEnabled: !extensionEnabled }, () => {
-      console.log(`Extension toggled: ${!extensionEnabled}`);
-      updateToggleButton();
-    });
-  });
+  chrome.storage.local.get(
+    { extensionEnabled: true },
+    ({ extensionEnabled }) => {
+      // Toggle the extensionEnabled value
+      chrome.storage.local.set({ extensionEnabled: !extensionEnabled }, () => {
+        console.log(`Extension toggled: ${!extensionEnabled}`);
+        updateToggleButton();
+      });
+    },
+  );
 });
 
 // Update the button text when the popup is opened
