@@ -107,18 +107,31 @@ function fetchBrandDataFromGithub() {
           { brandData: null, fetchTime: null },
           ({ brandData, fetchTime }) => {
             const currentTime = Date.now();
+            if (!brandData) {
+              brandData = defaultBrandData; // Use default brand data if not found in local storage
+            }
             if (
-              !brandData ||
               !fetchTime ||
               currentTime - fetchTime > 24 * 60 * 60 * 1000
             ) {
               // If brandData is not in local storage or it's older than one day, fetch it again
-              if (!brandData) {
-                brandData = defaultBrandData; // Use default brand data if not found in local storage
-              }
-
-              // Update the names in the brandData with the fetched data
-              for (let brandCategory of brandData) {
+              // Merge the fetched brand data with the existing brand data
+              for (let fetchedBrandCategory of fetchedBrandData) {
+                let brandCategory = brandData.find(category => category.name === fetchedBrandCategory.name);
+                if (!brandCategory) {
+                  // If the brand category does not exist in the existing brand data, add it
+                  brandCategory = { ...fetchedBrandCategory };
+                  brandData.push(brandCategory);
+                } else {
+                  // If the brand category exists in the existing brand data, merge the brand names
+                  const existingBrandNames = new Set(brandCategory.names.map(brand => brand.name));
+                  fetchedBrandCategory.names.forEach(fetchedBrand => {
+                    if (!existingBrandNames.has(fetchedBrand.name)) {
+                      // If the brand name does not exist in the existing brand data, add it
+                      brandCategory.names.push(fetchedBrand);
+                    }
+                  });
+                }
                 if (fetchedBrandData[brandCategory.name]) {
                   // Assuming brandCategory.names is the array you want to filter
                   const uniqueNames = new Set(brandCategory.names);
