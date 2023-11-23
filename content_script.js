@@ -23,6 +23,7 @@ class Trie {
   }
 
   search(word) {
+    console.log('Searching for word:', word);
     let node = this.root;
     for (let char of word) {
       if (!node.children[char]) {
@@ -30,6 +31,8 @@ class Trie {
       }
       node = node.children[char];
     }
+    console.log('Searching for word:', node.endOfWord);
+
     return node.endOfWord;
   }
 }
@@ -44,7 +47,7 @@ function addEmojisToTextNode(textNode, brandData) {
         if (brand.names) {
           brand.names.forEach((brandName) => {
             // Split brand name into words
-            const brandWords = brandName.toLowerCase().split(' ');
+            const brandWords = brandName.split(' ');
 
             // Insert each word into the trie
             brandWords.forEach((word) => {
@@ -52,7 +55,7 @@ function addEmojisToTextNode(textNode, brandData) {
             });
           });
         } else if (brandCategory.name === "Custom Brands") {
-          trie.insert(brand.name.toLowerCase(), {
+          trie.insert(brand.name, {
             name: brand.name,
             category: brandCategory,
             brand: brand,
@@ -73,7 +76,7 @@ function addEmojisToTextNode(textNode, brandData) {
     const matchedBrand = trie.search(word.toLowerCase());
     if (matchedBrand) {
       matchedBrandWords.push(word);
-      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name.toLowerCase()) {
+      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name) {
         const parent = textNode.parentNode;
         if (!parent) {
           break;
