@@ -117,6 +117,7 @@ toggleExtensionButton.addEventListener("click", () => {
 // Update the button text when the popup is opened
 updateToggleButton();
 const addCustomBrandButton = document.getElementById("addCustomBrandButton");
+import { defaultBrandData } from './background.js';
 const customBrandInput = document.getElementById("customBrandInput");
 
 addCustomBrandButton.addEventListener("click", () => {
@@ -138,7 +139,12 @@ addCustomBrandButton.addEventListener("click", () => {
 });
 // Function to display the list of custom brands
 function displayCustomBrands() {
-  const customBrandsArea = document.getElementById("customBrandsArea");
+  let customBrandsArea = document.getElementById("customBrandsArea");
+  if (!customBrandsArea) {
+    customBrandsArea = document.createElement("div");
+    customBrandsArea.id = "customBrandsArea";
+    document.body.appendChild(customBrandsArea);
+  }
   customBrandsArea.innerHTML = ""; // Clear the area
 
   // Retrieve the brand data from local storage
