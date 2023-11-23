@@ -34,9 +34,12 @@ class Trie {
   }
 }
 
-let brandCounter = 0; // Counter for brands found on the page
+let brandCounter = null; // Counter for brands found on the page
 
 function addEmojisToTextNode(textNode, brandData) {
+  if (brandCounter === null) {
+    brandCounter = 0;
+  }
   if (hasEmoji(textNode)) return;
 
   const trie = new Trie();
@@ -68,7 +71,11 @@ function addEmojisToTextNode(textNode, brandData) {
     const word = words[i];
     const matchedBrand = trie.search(word.toLowerCase());
     if (matchedBrand) {
-      brandCounter++; // Increment the counter when a brand is found
+      if (brandCounter === null) {
+        brandCounter = 1;
+      } else {
+        brandCounter++; // Increment the counter when a brand is found
+      }
       matchedBrandWords.push(word);
       if (
         matchedBrandWords.join(" ").toLowerCase() ===
@@ -209,7 +216,7 @@ function traverseAndAddEmojis(node, brandData) {
 
 // Retrieve brandData from local storage or use default values
 chrome.storage.local.get(
-  { brandData: null, extensionEnabled: true, globalBrandCounter: 0 },
+  { brandData: null, extensionEnabled: true, globalBrandCounter: null },
   ({ brandData, extensionEnabled, globalBrandCounter }) => {
     if (!extensionEnabled) {
       console.log("Extension is disabled");
@@ -225,13 +232,22 @@ chrome.storage.local.get(
       let isProcessing = false;
       let pendingMutations = false;
 
+      if (globalBrandCounter === null) {
+        globalBrandCounter = 0;
+      }
+
       requestIdleCallback(() => {
         traverseAndAddEmojis(document.body, brandData);
         // Save the counter to the Chrome storage with a key specific to the current page URL
         chrome.storage.local.set({ [window.location.href]: brandCounter });
         // Update the global counter in the storage
+        if (globalBrandCounter === null) {
+          globalBrandCounter = brandCounter;
+        } else {
+          globalBrandCounter += brandCounter;
+        }
         chrome.storage.local.set({
-          globalBrandCounter: globalBrandCounter + brandCounter,
+          globalBrandCounter: globalBrandCounter,
         });
       });
 
