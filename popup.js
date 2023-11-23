@@ -130,8 +130,34 @@ addCustomBrandButton.addEventListener("click", () => {
         } else {
           console.log(`Custom brand '${customBrand}' added`);
           customBrandInput.value = "";
+          displayCustomBrands(); // Call the new function after a new custom brand is added
         }
       },
     );
   }
 });
+// Function to display the list of custom brands
+function displayCustomBrands() {
+  const customBrandsArea = document.getElementById("customBrandsArea");
+  customBrandsArea.innerHTML = ""; // Clear the area
+
+  // Retrieve the brand data from local storage
+  chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+    if (brandData) {
+      // Filter out the custom brands
+      const customBrands = brandData.find(
+        (category) => category.name === "Custom Brands"
+      );
+
+      if (customBrands) {
+        // Append each custom brand to the designated area
+        customBrands.names.forEach((brand) => {
+          const brandElement = document.createElement("p");
+          brandElement.textContent = brand.name;
+          customBrandsArea.appendChild(brandElement);
+        });
+      }
+    }
+  });
+}
+displayCustomBrands(); // Call the function when the popup is opened
