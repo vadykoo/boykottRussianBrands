@@ -62,7 +62,11 @@ function addEmojisToTextNode(textNode, brandData) {
     }
   });
 
-  const words = textNode.nodeValue.split(' ');
+  const words = textNode.nodeValue.split(' ').filter(word => {
+    // Filter out prices, empty strings, and strings smaller than 4 characters
+    return !hasNumbers(word) && word.trim().length >= 4;
+  });
+  
   let matchedBrandWords = [];
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
@@ -102,6 +106,10 @@ function addEmojisToTextNode(textNode, brandData) {
   }
 }
 
+// Function to check if a string has numbers
+function hasNumbers(word) {
+  return /\d/.test(word);
+}
 // Function to check if the text node already contains an emoji
 function hasEmoji(textNode) {
   const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;

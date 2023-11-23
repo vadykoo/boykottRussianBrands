@@ -126,7 +126,7 @@ function fetchBrandDataFromGithub() {
                   brandCategory.names = fetchedBrandData[
                     brandCategory.name
                   ].map((brand) => ({
-                    names: brand.name, // brand.name is now an array of brand names
+                    names: brand.name.map(name => name.toLowerCase()), // Convert all brand names to lowercase
                     description: brand.description,
                     linkSource: brand.linkSource,
                   }));
