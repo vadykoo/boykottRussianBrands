@@ -146,7 +146,7 @@ function displayCustomBrands() {
     if (brandData) {
       // Filter out the custom brands
       const customBrands = brandData.find(
-        (category) => category.name === "Custom Brands"
+        (category) => category.name === "Custom Brands",
       );
 
       if (customBrands) {
