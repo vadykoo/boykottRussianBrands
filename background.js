@@ -52,24 +52,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       if (message.action === "addCustomBrand") {
-              const customBrandCategory = brandData.find(
-                (category) => category.name === "Custom Brands",
-              );
-              if (!customBrandCategory) {
-                brandData.push({
-                  name: "Custom Brands",
-                  enabled: true,
-                  names: [{name: message.brand, enabled: true, emoji: "🚩"}],
-                  emoji: "🚩",
-                });
-              } else {
-                customBrandCategory.names.push({name: message.brand, enabled: true, emoji: "🚩"});
-              }
-              // Save the updated brandData to local storage
-              chrome.storage.local.set({ brandData }, () => {
-                sendResponse({ success: true });
-              });
-            } else {
+        const customBrandCategory = brandData.find(
+          (category) => category.name === "Custom Brands",
+        );
+        if (!customBrandCategory) {
+          brandData.push({
+            name: "Custom Brands",
+            enabled: true,
+            names: [{ name: message.brand, enabled: true, emoji: "🚩" }],
+            emoji: "🚩",
+          });
+        } else {
+          customBrandCategory.names.push({
+            name: message.brand,
+            enabled: true,
+            emoji: "🚩",
+          });
+        }
+        // Save the updated brandData to local storage
+        chrome.storage.local.set({ brandData }, () => {
+          sendResponse({ success: true });
+        });
+      } else {
         const { name, enabled } = message;
         const brandCategory = brandData.find(
           (category) => category.name === name,
