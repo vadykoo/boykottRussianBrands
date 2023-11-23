@@ -50,8 +50,8 @@ function addEmojisToTextNode(textNode, brandData) {
             });
           });
         } else if (brandCategory.name === "Custom Brands") {
-          trie.insert(brand.toLowerCase(), {
-            name: brand,
+          trie.insert(brand.name.toLowerCase(), {
+            name: brand.name,
             category: brandCategory,
             brand: brand,
           });
