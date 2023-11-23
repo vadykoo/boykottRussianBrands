@@ -1,4 +1,4 @@
-const defaultBrandData = [
+export const defaultBrandData = [
   // {
   //   name: "Ukrainian Brands",
   //   enabled: true,
