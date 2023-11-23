@@ -107,3 +107,19 @@ toggleExtensionButton.addEventListener("click", () => {
 
 // Update the button text when the popup is opened
 updateToggleButton();
+const addCustomBrandButton = document.getElementById("addCustomBrandButton");
+const customBrandInput = document.getElementById("customBrandInput");
+
+addCustomBrandButton.addEventListener("click", () => {
+  const customBrand = customBrandInput.value.trim();
+  if (customBrand) {
+    chrome.runtime.sendMessage({ action: 'addCustomBrand', brand: customBrand }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+      } else {
+        console.log(`Custom brand '${customBrand}' added`);
+        customBrandInput.value = '';
+      }
+    });
+  }
+});
