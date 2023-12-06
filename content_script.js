@@ -12,6 +12,10 @@ class Trie {
   }
 
   insert(word, brand) {
+    if (typeof word !== 'string') {
+      return null;
+    }
+
     let node = this.root;
     for (let char of word) {
       if (!node.children[char]) {
@@ -30,6 +34,7 @@ class Trie {
       }
       node = node.children[char];
     }
+
     return node.endOfWord;
   }
 }
@@ -44,26 +49,36 @@ function addEmojisToTextNode(textNode, brandData) {
         if (brand.names) {
           brand.names.forEach((brandName) => {
             // Split brand name into words
-            const brandWords = brandName.toLowerCase().split(' ');
+            const brandWords = brandName.split(' ');
 
             // Insert each word into the trie
             brandWords.forEach((word) => {
               trie.insert(word, { name: brandName, category: brandCategory, brand: brand });
             });
           });
+        } else if (brandCategory.name === "Custom Brands") {
+          trie.insert(brand.name, {
+            name: brand.name,
+            category: brandCategory,
+            brand: brand,
+          });
         }
       });
     }
   });
 
-  const words = textNode.nodeValue.split(' ');
+  const words = textNode.nodeValue.split(' ').filter(word => {
+    // Filter out prices, empty strings, and strings smaller than 4 characters
+    return !hasNumbers(word) && word.trim().length >= 4;
+  });
+  
   let matchedBrandWords = [];
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
     const matchedBrand = trie.search(word.toLowerCase());
     if (matchedBrand) {
       matchedBrandWords.push(word);
-      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name.toLowerCase()) {
+      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name) {
         const parent = textNode.parentNode;
         if (!parent) {
           break;
@@ -96,6 +111,10 @@ function addEmojisToTextNode(textNode, brandData) {
   }
 }
 
+// Function to check if a string has numbers
+function hasNumbers(word) {
+  return /\d/.test(word);
+}
 // Function to check if the text node already contains an emoji
 function hasEmoji(textNode) {
   const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
@@ -107,21 +126,21 @@ function createTooltip(brand) {
   if (!brand.description || !brand.linkSource) {
     return null;
   }
-  const tooltip = document.createElement('div');
-  tooltip.style.all = 'initial'; // Reset all inherited styles
-  tooltip.style.display = 'none';
-  tooltip.style.position = 'fixed'; // Change this line
-  tooltip.style.top = '100%';
-  tooltip.style.left = '0';
-  tooltip.style.width = '240px';
-  tooltip.style.padding = '16px';
-  tooltip.style.background = '#e2f8ee';
-  tooltip.style.color = '#414141';
-  tooltip.style.fontSize = '14px';
-  tooltip.style.borderRadius = '8px';
-  tooltip.style.zIndex = '9999';
+  const tooltip = document.createElement("div");
+  tooltip.style.all = "initial"; // Reset all inherited styles
+  tooltip.style.display = "none";
+  tooltip.style.position = "fixed"; // Change this line
+  tooltip.style.top = "100%";
+  tooltip.style.left = "0";
+  tooltip.style.width = "240px";
+  tooltip.style.padding = "16px";
+  tooltip.style.background = "#e2f8ee";
+  tooltip.style.color = "#414141";
+  tooltip.style.fontSize = "14px";
+  tooltip.style.borderRadius = "8px";
+  tooltip.style.zIndex = "9999";
 
-  let tooltipHTML = '';
+  let tooltipHTML = "";
   if (brand.description) {
     tooltipHTML += `<p>${brand.description}</p>`;
   }
@@ -130,39 +149,37 @@ function createTooltip(brand) {
   }
   tooltip.innerHTML = tooltipHTML;
 
-  tooltip.classList.add('brand-tooltip'); // Add a class to the tooltip
+  tooltip.classList.add("brand-tooltip"); // Add a class to the tooltip
 
+  // Create a close button
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "X";
+  closeButton.style.position = "absolute";
+  closeButton.style.top = "0";
+  closeButton.style.right = "0";
+  closeButton.style.background = "none";
+  closeButton.style.border = "none";
+  closeButton.style.fontSize = "16px";
+  closeButton.style.cursor = "pointer";
 
-   // Create a close button
-   const closeButton = document.createElement('button');
-   closeButton.textContent = 'X';
-   closeButton.style.position = 'absolute';
-   closeButton.style.top = '0';
-   closeButton.style.right = '0';
-   closeButton.style.background = 'none';
-   closeButton.style.border = 'none';
-   closeButton.style.fontSize = '16px';
-   closeButton.style.cursor = 'pointer';
- 
-   // Add an event listener to the close button to hide the tooltip when clicked
-   closeButton.addEventListener('click', (event) => {
-     event.stopPropagation();
-     tooltip.style.display = 'none';
-   });
- 
-   // Add the close button to the tooltip
-   tooltip.appendChild(closeButton);
-   
+  // Add an event listener to the close button to hide the tooltip when clicked
+  closeButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    tooltip.style.display = "none";
+  });
+
+  // Add the close button to the tooltip
+  tooltip.appendChild(closeButton);
 
   return tooltip;
 }
 
 // Function to create a span element for the brand name and emoji
 function createBrandSpan(match, brandCategory, brand) {
-  const span = document.createElement('span');
+  const span = document.createElement("span");
   span.textContent = `${match} ${brandCategory.emoji}`;
-  span.style.position = 'relative';
-  span.classList.add('brand-span'); // Add a class to the span for identification
+  span.style.position = "relative";
+  span.classList.add("brand-span"); // Add a class to the span for identification
   span.dataset.brand = JSON.stringify(brand); // Store the brand data in the dataset
 
   return span;
@@ -186,75 +203,76 @@ function traverseAndAddEmojis(node, brandData) {
 }
 
 // Retrieve brandData from local storage or use default values
-chrome.storage.local.get({ brandData: null, extensionEnabled: true }, ({ brandData, extensionEnabled }) => {
+chrome.storage.local.get(
+  { brandData: null, extensionEnabled: true },
+  ({ brandData, extensionEnabled }) => {
+    if (!extensionEnabled) {
+      console.log("Extension is disabled");
+      return;
+    }
 
-  if (!extensionEnabled) {
-    console.log('Extension is disabled');
-    return;
-  }
-
-  let observer;
-  function processPage() {
-
-    // Disconnect the old observer, if it exists
-  if (observer) {
-    observer.disconnect();
-  }
-    let isProcessing = false;
-    let pendingMutations = false;
-  
-    requestIdleCallback(() => {
-      traverseAndAddEmojis(document.body, brandData);
-    });
-  
-    observer = new MutationObserver((mutationsList) => {
-      if (isProcessing) {
-        pendingMutations = true;
-        return;
+    let observer;
+    function processPage() {
+      // Disconnect the old observer, if it exists
+      if (observer) {
+        observer.disconnect();
       }
-  
-      isProcessing = true;
-  
-      mutationsList.forEach((mutation) => {
-        if (mutation.type === "childList") {
-          mutation.addedNodes.forEach((node) => {
+      let isProcessing = false;
+      let pendingMutations = false;
+
+      requestIdleCallback(() => {
+        traverseAndAddEmojis(document.body, brandData);
+      });
+
+      observer = new MutationObserver((mutationsList) => {
+        if (isProcessing) {
+          pendingMutations = true;
+          return;
+        }
+
+        isProcessing = true;
+
+        mutationsList.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            mutation.addedNodes.forEach((node) => {
               if (node.nodeType === Node.TEXT_NODE) {
                 addEmojisToTextNode(node, brandData);
               } else if (node.nodeType === Node.ELEMENT_NODE) {
                 traverseAndAddEmojis(node, brandData);
               }
-          });
-        }
-      });
-  
-      isProcessing = false;
-  
-      if (pendingMutations) {
-        pendingMutations = false;
-        observer.takeRecords().forEach(mutation => {
-          if (mutation.type === "childList") {
-            mutation.addedNodes.forEach((node) => {
+            });
+          }
+        });
+
+        isProcessing = false;
+
+        if (pendingMutations) {
+          pendingMutations = false;
+          observer.takeRecords().forEach((mutation) => {
+            if (mutation.type === "childList") {
+              mutation.addedNodes.forEach((node) => {
                 if (node.nodeType === Node.TEXT_NODE) {
                   addEmojisToTextNode(node, brandData);
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
                   traverseAndAddEmojis(node, brandData);
                 }
-            });
-          }
-        });
-      }
-    });
-  
-    observer.observe(document, { childList: true, subtree: true });
-  }
+              });
+            }
+          });
+        }
+      });
 
-  // Call processPage when the page loads
-  window.addEventListener("load", processPage);
+      observer.observe(document, { childList: true, subtree: true });
+    }
 
-  // Also call processPage when the URL changes
-  window.addEventListener("hashchange", processPage);
-  window.addEventListener("popstate", processPage);
-});
+    // Call processPage when the page loads
+    window.addEventListener("load", processPage);
+
+    // Also call processPage when the URL changes
+    window.addEventListener("hashchange", processPage);
+    window.addEventListener("popstate", processPage);
+  },
+);
 
 let hideTooltipTimeout;
 function addTooltipEventListeners(tooltip, brandSpan) {
@@ -307,12 +325,11 @@ function addTooltipEventListeners(tooltip, brandSpan) {
     }
   }
 }
-
 document.body.addEventListener('mouseover', (event) => {
   if (event.target.classList.contains('brand-span')) {
     // Check if a tooltip is already displayed
-    const existingTooltip = event.target.querySelector('div');
-    if (existingTooltip && existingTooltip.style.display === 'block') {
+    const existingTooltip = event.target.querySelector("div");
+    if (existingTooltip && existingTooltip.style.display === "block") {
       return;
     }
 
@@ -328,7 +345,7 @@ document.body.addEventListener('mouseover', (event) => {
       event.target.appendChild(tooltip);
       addTooltipEventListeners(tooltip, event.target); // Add event listeners to the tooltip and brand span
       clearTimeout(hideTooltipTimeout);
-      tooltip.style.display = 'block';
+      tooltip.style.display = "block";
     }
   }
 });
