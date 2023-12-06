@@ -4,7 +4,7 @@ const defaultBrandData = [
   //   enabled: true,
   //   names: ["Чумак", "Prestigio"], // Add more Ukrainian brands here
   //   emoji: "🇺🇦",
-  // },
+  // }, 
   {
     name: "Russian Brands",
     enabled: true,

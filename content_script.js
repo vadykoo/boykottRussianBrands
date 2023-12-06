@@ -27,7 +27,6 @@ class Trie {
   }
 
   search(word) {
-    console.log('Searching for word:', word);
     let node = this.root;
     for (let char of word) {
       if (!node.children[char]) {
@@ -35,7 +34,6 @@ class Trie {
       }
       node = node.children[char];
     }
-    console.log('Searching for word:', node.endOfWord);
 
     return node.endOfWord;
   }

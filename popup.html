@@ -1,74 +1,180 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Russian Brands Marker</title>
-    <style>
-      body {
-        background-color: lightblue;
-      }
-      button {
-        background-color: white;
-        border: 2px solid black;
-        color: black;
-        padding: 10px 24px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-      }
-      #totalBrands {
-        display: inline-block;
-        border: 2px solid black;
-        border-radius: 50%;
-        padding: 10px;
-        background-color: white;
-      }
-      label {
-        display: block;
-        margin-bottom: 8px;
-      }
-      #customBrandsList {
-        margin-top: 20px;
-      }
-      
-    </style>
-  </head>
-  <body>
-    <h1>Налаштування/Settings</h1>
+<!DOCTYPE html>
+<html lang="en">
 
-    <button id="toggleExtension">Toggle Extension</button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Russian Brands Marker</title>
+  <style>
+    body {
+      min-width: 350px;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
 
+    h1, h2, h3 {
+      color: #3498db;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #3498db;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 8px 0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #totalBrands {
+      display: inline-block;
+      background-color: #3498db;
+      color: #fff;
+      border-radius: 50%;
+      padding: 10px;
+      margin-left: 8px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    #brandSearch {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+    }
+
+    .searchPanel {
+      max-height: 150px;
+      overflow-y: auto;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #customBrandsContainer {
+      display: flex;
+      align-items: center;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    #customBrandInput {
+      width: calc(100% - 40px);
+      padding: 10px;
+      margin-right: 10px;
+      box-sizing: border-box;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+    }
+
+    #addCustomBrandButton {
+      background-color: #3498db;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #customBrandsUl {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #customBrandsList li {
+      margin-bottom: 8px;
+    }
+
+    #toggleExtension, #fetchBrandDataButton {
+      margin-right: 10px;
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      display: block;
+      margin-top: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Add space between buttons */
+      /* display: none; */
+    }
+
+    /* Add any additional styles as needed */
+  </style>
+</head>
+
+<body>
+  <h1>Перевірити бренд</h1>
+
+  <div class="searchPanel">
+    <input type="text" id="brandSearch" placeholder="Search brands...">
+    <div id="searchResults"></div>
+  </div>
+
+<!-- Add a container for the custom brands list -->
+<div>
+  <h3>Додати свій до списку:</h3>
+  <div id="customBrandsContainer">
+    <input type="text" id="customBrandInput" placeholder="Введіть свій бренд" />
+    <button id="addCustomBrandButton">➕</button>
+  </div>
+
+  <div id="customBrandsContainer">
+    <ul id="customBrandsUl"></ul>
+  </div>
+</div>
+
+  <div>
+    <p id="brandText">
+      <span>Number of brands: </span>
+      <span id="totalBrands" class="circle"></span>
+    </p>
+  </div>
+
+  <div>
     <form id="brandForm">
       <!-- Checkbox elements will be dynamically generated here -->
     </form>
+  </div>
+  
+  <div class="buttons">
+    <button id="fetchBrandDataButton">🔄 Оновити</button>
+    <button id="toggleExtension">Toggle Extension</button>
+  </div>
+  <p id="brandCount"></p>
+  
+  <a href="https://forms.gle/oBgNEt5z7QcMbhjd8" target="_blank">Запропонувати бренд чи залишити відгук</a>
+  <script src="popup.js"></script>
+</body>
 
-    <p id="brandText">
-      <span>Number of brands: </span
-      ><span id="totalBrands" class="circle"></span>
-    </p>
-
-    <!-- <p id="lastUpdated">Last updated: </p> -->
-
-    <input type="text" id="customBrandInput" placeholder="Enter custom brand" />
-    <button id="addCustomBrandButton">Add Custom Brand</button>
-
-    <div id="customBrandsList">
-      <h2>Custom Brands:</h2>
-      <ul id="customBrandsUl"></ul>
-    </div>
-
-    <button id="fetchBrandDataButton">
-      Оновити список брендів/Update list
-    </button>
-    <p id="brandCount"></p>
-
-    <a href="https://forms.gle/oBgNEt5z7QcMbhjd8" target="_blank"
-      >Запропонувати бренд чи залишити відгук</a
-    >
-    <!-- <script src="constants.js"></script> -->
-    <script src="popup.js"></script>
-  </body>
 </html>

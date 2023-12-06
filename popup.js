@@ -88,6 +88,73 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    //search
+  const searchInput = document.getElementById("brandSearch");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", function () {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    // Clear previous search results
+    searchResults.innerHTML = "";
+
+    if (searchTerm.trim() === "") {
+      return; // Exit if the search term is empty
+    }
+
+    chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+      if (!brandData) {
+        brandData = defaultBrandData; // Use default brand data if not found in local storage
+      }
+
+      // Iterate through brandData and find matches
+      const matchingBrands = [];
+      for (const category of brandData) {
+        if (category.names) {
+          for (const brand of category.names) {
+            // Ensure brand.names is defined before iterating
+            if (brand.names) {
+              for (const brandName of brand.names) {
+                // Ensure brandName is defined before accessing its properties
+                const currentBrandName = (brandName || '').toLowerCase();
+
+                if (currentBrandName.includes(searchTerm)) {
+                  matchingBrands.push(brand);
+                  if (matchingBrands.length >= 5) {
+                    break; // Stop iterating if we have 5 matches
+                  }
+                  break; // Exit the brand.names loop if a match is found
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Display the first 5 matching brands in the popup
+      for (let i = 0; i < Math.min(5, matchingBrands.length); i++) {
+        const brand = matchingBrands[i];
+        const brandElement = document.createElement("div");
+        brandElement.textContent = brand.names[0] || ''; // Use the first name if available
+
+        // Display description or link if available
+        if (brand.description) {
+          const descriptionElement = document.createElement("p");
+          descriptionElement.textContent = brand.description;
+          brandElement.appendChild(descriptionElement);
+        } else if (brand.linkSource) {
+          const linkElement = document.createElement("a");
+          linkElement.href = brand.linkSource;
+          linkElement.target = "_blank";
+          linkElement.textContent = "Learn more";
+          brandElement.appendChild(linkElement);
+        }
+
+        searchResults.appendChild(brandElement);
+      }
+    });
+  });
+    //search
 });
 
 const fetchBrandDataButton = document.getElementById("fetchBrandDataButton");
