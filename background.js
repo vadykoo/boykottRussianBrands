@@ -1,24 +1,27 @@
-const defaultBrandData = [
+var defaultBrandData = [
   // {
   //   name: "Ukrainian Brands",
   //   enabled: true,
-  //   names: ["Чумак", "Prestigio"], // Add more Ukrainian brands here
+  //   names: ["Чумак", "Pobedov"], // Add more Ukrainian brands here
   //   emoji: "🇺🇦",
   // }, 
-  {
-    name: "Russian Brands",
-    enabled: true,
-    names: [], // Add more Russian brands here
-    emoji: "❌ ",
-  },
   // {
-  //   name: "Бренди досі активно працюють в росії",
+  //   name: "Russian Brands",
+  //   enabled: true,
+  //   names: [], // Add more Russian brands here
+  //   emoji: "❌ ",
+  // },
+  // {
+  //   name: "Бренди що досі активно працюють в росії",
   //   enabled: false,
   //   names: [], // Add more Russian brands here
   //   emoji: "🟨",
   // },
   // Add more brand categories and their corresponding emojis here
+  // this info will be updated from github
 ];
+
+var userSettings;
 
 const defaultCustomBrands = {
   name: "Custom Brands",
@@ -30,10 +33,12 @@ const defaultCustomBrands = {
 function saveDefaultBrandDataToStorage() {
   chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
     if (!brandData) {
-      // If brandData is not in local storage, use the defaultBrandData
-      brandData = defaultBrandData;
-      // Save the defaultBrandData to local storage
-      chrome.storage.local.set({ brandData });
+      // If brandData is not in local storage, fetch the defaultBrandData
+      fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
+        // Save the defaultBrandData to local storage
+        console.log(defaultBrandData);
+        chrome.storage.local.set({ brandData: defaultBrandData });
+      });
     }
   });
 }
@@ -122,10 +127,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchBrandDataFromGithub() {
-  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json")
-    .then((response) => response.json())
-    .then((fetchedBrandData) => {
-      return new Promise((resolve, reject) => {
+  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrands.json")
+  .then((response) => response.json())
+  .then((fetchedBrandData) => {
+    return new Promise((resolve, reject) => {
+      fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
         chrome.storage.local.get(
           { brandData: null, fetchTime: null, customBrands: [] },
           ({ brandData, fetchTime, customBrands }) => {
@@ -192,6 +198,15 @@ function fetchBrandDataFromGithub() {
           },
         );
       });
+      });
     })
     .catch((error) => console.error("Error:", error));
 }
+
+function fetchDefaultBrandDataFromGithub() {
+  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/defaultBrandDataSettings.json")
+    .then((response) => response.json())
+    .catch((error) => console.error("Error:", error));
+}
+
+
