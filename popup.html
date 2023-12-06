@@ -129,6 +129,14 @@
       /* display: none; */
     }
 
+    .brand-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .emoji {
+      margin-right: 10px;
+    }
     /* Add any additional styles as needed */
   </style>
 </head>
@@ -161,12 +169,16 @@
     </p>
   </div>
 
-  <div>
-    <form id="brandForm">
-      <!-- Checkbox elements will be dynamically generated here -->
-    </form>
-  </div>
-  
+  <div id="brandForm"></div>
+  <template id="brandTemplate">
+    <div class="brand-container">
+      <input type="checkbox" class="brandCheckbox">
+      <span class="emoji brandEmoji"></span>
+      <label class="brandName"></label>
+    </div>
+  </template>
+
+
   <div class="buttons">
     <button id="fetchBrandDataButton">🔄 Оновити</button>
     <button id="toggleExtension">Toggle Extension</button>

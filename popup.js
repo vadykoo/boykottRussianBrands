@@ -1,17 +1,20 @@
 const brandForm = document.getElementById("brandForm");
 
-// Function to create checkbox element for each brand category
-function createCheckbox(name, enabled) {
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
+function createCheckbox(name, enabled, emoji) {
+  const brandTemplate = document.getElementById("brandTemplate");
+  const brandContainer = brandTemplate.content.cloneNode(true);
+
+  const checkbox = brandContainer.querySelector(".brandCheckbox");
   checkbox.name = name;
   checkbox.checked = enabled;
 
-  const label = document.createElement("label");
-  label.textContent = name;
-  label.appendChild(checkbox);
+  const emojiSpan = brandContainer.querySelector(".brandEmoji");
+  emojiSpan.textContent = emoji;
 
-  brandForm.appendChild(label);
+  const label = brandContainer.querySelector(".brandName");
+  label.textContent = name;
+
+  brandForm.appendChild(brandContainer);
 
   // Add event listener to toggle brand category and send message to background script
   checkbox.addEventListener("change", () => {
@@ -35,8 +38,8 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
     brandData = defaultBrandData; // Use default brand data if not found in local storage
   }
 
-  brandData.forEach(({ name, enabled }) => {
-    createCheckbox(name, enabled);
+  brandData.forEach(({ name, enabled, emoji }) => {
+    createCheckbox(name, enabled, emoji);
   });
 });
 
@@ -162,9 +165,7 @@ const brandCount = document.getElementById("brandCount");
 
 fetchBrandDataButton.addEventListener("click", () => {
   chrome.storage.local.remove("brandData", function () {
-    console.log(
-      "brandData has been removed from local storage and updated from GitHub",
-    );
+    console.log("brandData has been removed from local storage");
   });
 
   chrome.runtime.sendMessage({ action: "fetchBrandData" }, (response) => {
