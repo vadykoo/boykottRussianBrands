@@ -189,7 +189,7 @@ function createBrandSpan(match, brandCategory, brand) {
 function traverseAndAddEmojis(node, brandData) {
   if (node.nodeType === Node.TEXT_NODE) {
     addEmojisToTextNode(node, brandData);
-  } else if (node.nodeType === Node.ELEMENT_NODE) {
+  } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('brand-tooltip')) {
     let i = 0;
     function processNextChild() {
       if (i < node.childNodes.length) {
