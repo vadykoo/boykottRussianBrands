@@ -71,6 +71,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true });
       });
     });
+
+    // Add customBrands to brandData only here
+    chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+      if (!brandData) {
+        brandData = defaultBrandData; // Use default brand data if not found in local storage
+      }
+
+      const customBrandCategory = brandData.find(
+        (category) => category.name === "Custom Brands",
+      );
+      if (!customBrandCategory) {
+        brandData.push({
+          name: "Custom Brands",
+          enabled: true,
+          names: [{ name: message.brand, enabled: true, emoji: "🚩" }],
+          emoji: "🚩",
+        });
+      } else {
+        customBrandCategory.names.push({
+          name: message.brand,
+          enabled: true,
+          emoji: "🚩",
+        });
+      }
+      // Save the updated brandData to local storage
+      chrome.storage.local.set({ brandData }, () => {
+        sendResponse({ success: true });
+      });
+    });
   }
 
   // Check if the message is from the popup
@@ -127,7 +156,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchBrandDataFromGithub() {
-  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrands.json")
+  return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json")
   .then((response) => response.json())
   .then((fetchedBrandData) => {
     return new Promise((resolve, reject) => {
@@ -162,31 +191,19 @@ function fetchBrandDataFromGithub() {
                 }
               }
 
-              // Check for duplicates before appending custom brands
-              const customBrandCategory = brandData.find(
-                (category) => category.name === "Custom Brands"
-              );
-
-              const existingCustomBrandNames = customBrandCategory
-                ? customBrandCategory.names.map((brand) => brand.name)
-                : [];
-
-              // Append only those custom brands that don't already exist
-              const newCustomBrands = customBrands.filter(
-                (customBrand) =>
-                  !existingCustomBrandNames.includes(customBrand.name)
-              );
-
-              if (newCustomBrands.length > 0) {
-                // Append new custom brands to the "Custom Brands" category
+                // Check if customBrands is included in brandData
+                const customBrandCategory = brandData.find(
+                  (category) => category.name === "Custom Brands",
+                );
                 if (!customBrandCategory) {
-                  brandData.push(defaultCustomBrands);
+                  // If not, append customBrands to brandData
+                  brandData.push({
+                    name: "Custom Brands",
+                    enabled: true,
+                    names: customBrands,
+                    emoji: "🚩",
+                  });
                 }
-
-                brandData
-                  .find((category) => category.name === "Custom Brands")
-                  .names.push(...newCustomBrands);
-              }
 
               // Save the updated brandData to local storage
               chrome.storage.local.set({ brandData }, () => {
