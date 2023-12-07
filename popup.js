@@ -23,6 +23,9 @@ function createCheckbox(name, enabled, emoji) {
       enabled: checkbox.checked,
     };
     chrome.runtime.sendMessage(toggleData, (response) => {
+
+      updateUserSettings(name, checkbox.checked);
+
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError.message);
       } else {
@@ -43,20 +46,20 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   });
 });
 
+// Update the list of custom brands in the popup
+function updateCustomBrandsList(customBrands) {
+  const customBrandsUl = document.getElementById("customBrandsUl");
+  customBrandsUl.innerHTML = ""; // Clear the existing list
+
+  customBrands.forEach((customBrand) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = customBrand.name;
+    customBrandsUl.appendChild(listItem);
+  });
+}
+
 // Send a message to the background script when the popup is opened
 document.addEventListener("DOMContentLoaded", () => {
-    // Update the list of custom brands in the popup
-  function updateCustomBrandsList(customBrands) {
-    const customBrandsUl = document.getElementById("customBrandsUl");
-    customBrandsUl.innerHTML = ""; // Clear the existing list
-
-    customBrands.forEach((customBrand) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = customBrand.name;
-      customBrandsUl.appendChild(listItem);
-    });
-  }
-
   chrome.runtime.sendMessage({ action: "fetchBrandData" });
 
 
@@ -177,7 +180,17 @@ fetchBrandDataButton.addEventListener("click", () => {
         brandCount.textContent = `Number of brands on server: ${response.brandCount}`;
       });
     }
+
+    // Send updateBrandDataWithUserSettings message to background.js
+    chrome.runtime.sendMessage({ action: "updateUserSettings" }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+      } else {
+        console.log('Brand data updated with user settings');
+      }
+    });
   });
+
 });
 
 chrome.storage.local.get(
@@ -229,3 +242,25 @@ toggleExtensionButton.addEventListener("click", () => {
 
 // Update the button text when the popup is opened
 updateToggleButton();
+
+
+// When user changes settings in the brand form
+function updateUserSettings(name, enabled) {
+  chrome.storage.local.get(["userSettings"], ({ userSettings }) => {
+    // Find the brand in userSettings
+    const brand = userSettings.find(brand => brand.name === name);
+
+    // If the brand exists, update its enabled property
+    if (brand) {
+      brand.enabled = enabled;
+    } else {
+      // If the brand doesn't exist, add it to userSettings
+      userSettings.push({ name, enabled });
+    }
+
+    // Save updated userSettings to local storage
+    chrome.storage.local.set({ userSettings });
+
+    console.log('usersett', userSettings);
+  });
+}

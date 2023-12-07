@@ -210,3 +210,49 @@ function fetchDefaultBrandDataFromGithub() {
 }
 
 
+// Get userSettings from local storage
+chrome.storage.local.get({ userSettings: null }, ({ userSettings }) => {
+  // If userSettings doesn't exist
+  if (!userSettings) {
+    // Fetch the default brand data from GitHub
+    fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
+      // Initialize userSettings with the default brand data
+      userSettings = defaultBrandData.map(brand => ({
+        name: brand.name,
+        enabled: brand.enabled
+      }));
+
+      // Save userSettings to local storage
+      chrome.storage.local.set({ userSettings });
+    });
+  }
+  console.log(userSettings);
+});
+
+function updateBrandDataWithUserSettings() {
+  // Get userSettings and brandData from local storage
+  chrome.storage.local.get({ userSettings: null, brandData: null }, ({ userSettings, brandData }) => {
+    if(brandData) {
+    // Iterate over brandData
+    for (let brand of brandData) {
+      // If brand exists in userSettings, update its enabled property
+      const userSetting = userSettings.find(setting => setting.name === brand.name);
+      if (userSetting) {
+        brand.enabled = userSetting.enabled;
+      }
+    }
+
+      console.log('updateBrandDataWithUserSettings', brandData);
+
+      // Save the updated brandData to local storage
+      chrome.storage.local.set({ brandData });
+    }
+  });
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "updateUserSettings") {
+    //Update brandData with userSettings
+    updateBrandDataWithUserSettings();
+  }
+});
