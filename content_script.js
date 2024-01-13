@@ -73,42 +73,45 @@ function addEmojisToTextNode(textNode, brandData) {
   });
   
   let matchedBrandWords = [];
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const matchedBrand = trie.search(word.toLowerCase());
-    if (matchedBrand) {
-      matchedBrandWords.push(word);
-      if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name) {
-        const parent = textNode.parentNode;
-        if (!parent) {
-          break;
-        }
+  
+for (let i = 0; i < words.length; i++) {
+  const word = words[i];
+  const matchedBrand = trie.search(word.toLowerCase());
+  if (matchedBrand) {
+    matchedBrandWords.push(word);
 
-        const wordIndex = textNode.nodeValue.indexOf(matchedBrandWords.join(' '));
-        const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
-        const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length));
-
-        if (parent && matchedBrand) {
-          parent.insertBefore(preMatchTextNode, textNode);
-          const span = createBrandSpan(matchedBrandWords.join(' '), matchedBrand.category, matchedBrand.brand);
-          parent.insertBefore(span, textNode);
-
-          const remainingText = textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length);
-          if (remainingText) {
-            const remainingTextNode = document.createTextNode(remainingText);
-            parent.insertBefore(remainingTextNode, textNode);
-          }
-
-          parent.removeChild(textNode);
-        }
-
-        textNode = postMatchTextNode;
-        matchedBrandWords = [];
+    // Instead of checking for equality, check if the matched brand name includes the joined words
+    if (matchedBrand.name.toLowerCase().includes(matchedBrandWords.join(' ').toLowerCase())) {
+      const parent = textNode.parentNode;
+      if (!parent) {
+        break;
       }
-    } else {
+
+      const wordIndex = textNode.nodeValue.indexOf(matchedBrandWords.join(' '));
+      const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
+      const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length));
+
+      if (parent && matchedBrand) {
+        parent.insertBefore(preMatchTextNode, textNode);
+        const span = createBrandSpan(matchedBrandWords.join(' '), matchedBrand.category, matchedBrand.brand);
+        parent.insertBefore(span, textNode);
+
+        const remainingText = textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length);
+        if (remainingText) {
+          const remainingTextNode = document.createTextNode(remainingText);
+          parent.insertBefore(remainingTextNode, textNode);
+        }
+
+        parent.removeChild(textNode);
+      }
+
+      textNode = postMatchTextNode;
       matchedBrandWords = [];
     }
+  } else {
+    matchedBrandWords = [];
   }
+}
 }
 
 // Function to check if a string has numbers
