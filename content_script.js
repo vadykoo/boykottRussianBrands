@@ -146,7 +146,7 @@ function createTooltip(brand) {
   tooltip.style.width = "240px";
   tooltip.style.padding = "16px";
   tooltip.style.background = "#3498DB";
-  tooltip.style.color = "#fff";
+  // tooltip.style.color = "#ffffff !important";
   tooltip.style.fontSize = "14px";
   tooltip.style.borderRadius = "8px";
   tooltip.style.zIndex = "9999"; 
@@ -154,7 +154,7 @@ function createTooltip(brand) {
 
   let tooltipHTML = "";
   if (brand.description) {
-    tooltipHTML += `<p style="padding-bottom: 20px">${brand.description}</p>`;
+    tooltipHTML += `<p style="padding-bottom: 20px;color: #fff">${brand.description}</p>`;
   }
   if (brand.linkSource) {
     tooltipHTML += `<a href="${brand.linkSource}" style="text-decoration:underline;color: #fff; padding-top: 20px important!" target="_blank">Дізнатись більше</a>`;
@@ -173,6 +173,7 @@ function createTooltip(brand) {
   closeButton.style.border = "none";
   closeButton.style.fontSize = "16px";
   closeButton.style.cursor = "pointer";
+  closeButton.style.color = "#ffffff !important";
 
   // Add an event listener to the close button to hide the tooltip when clicked
   closeButton.addEventListener("click", (event) => {
@@ -309,11 +310,22 @@ let hideTooltipTimeout = 5;
 
 let activeTooltip = null;
 
-document.body.addEventListener('click', (event) => {
+document.body.addEventListener('mouseover', (event) => {
   const target = event.target;
-  event.preventDefault();
-
+  
   if (target.classList.contains('emoji-span')) {
+
+        // // Find the parent link element
+        // const linkElement = target.closest('a');
+        // console.log(linkElement)
+        // if (linkElement) {
+        //   // Prevent the default behavior of the click event (e.g., navigating to the link)
+        //   event.preventDefault();
+    
+        //   // Stop the event propagation to prevent it from reaching the anchor element
+        //   event.stopPropagation();
+        // }
+
     const brandSpan = target.closest('.brand-span');
 
     if (brandSpan) {
@@ -351,16 +363,9 @@ document.body.addEventListener('click', (event) => {
       if (tooltip.style.display === "block") {
         activeTooltip = tooltip; // Set the active tooltip
       }
-
-      event.preventDefault(); // Prevent the default behavior of links
     }
   }
 });
-
-
-
-
-
 
 function addTooltipEventListeners(tooltip, brandSpan) {
   let isTooltipHovered = false;
@@ -407,8 +412,6 @@ function addTooltipEventListeners(tooltip, brandSpan) {
     }
   }
 }
-
-
 
 // Add a function to remove event listeners
 function removeEventListeners() {
