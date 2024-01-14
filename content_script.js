@@ -39,7 +39,7 @@ class Trie {
 }
 
 function addEmojisToTextNode(textNode, brandData) {
-  if (hasEmoji(textNode)) return;
+  if (hasBrandNameWithoutEmoji(textNode)) return;
 
   const trie = new Trie();
   brandData.forEach((brandCategory) => {
@@ -106,17 +106,30 @@ function addEmojisToTextNode(textNode, brandData) {
       matchedBrandWords = [];
     }
   }
+// Function to check if the parent contains a brand name span without any descendant emoji span
+function hasBrandNameWithoutEmoji(node) {
+  let currentNode = node;
+
+  // Traverse ancestors until the root
+  while (currentNode && currentNode !== document) {
+    if (currentNode.nodeType === 1 && currentNode.classList.contains('brand-span')) {
+      const hasEmojiDescendant = currentNode.querySelector('.emoji-span');
+      if (hasEmojiDescendant) {
+        return true;
+      }
+    }
+    
+    currentNode = currentNode.parentNode;
+  }
+
+  return false;
+}
 }
 
 
 // Function to check if a string has numbers
 function hasNumbers(word) {
   return /\d/.test(word);
-}
-// Function to check if the text node already contains an emoji
-function hasEmoji(textNode) {
-  const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
-  return emojiRegex.test(textNode.nodeValue);
 }
 
 // Function to create a tooltip
@@ -173,16 +186,34 @@ function createTooltip(brand) {
   return tooltip;
 }
 
-// Function to create a span element for the brand name and emoji
 function createBrandSpan(match, brandCategory, brand) {
-  const span = document.createElement("span");
-  span.textContent = `${match} ${brandCategory.emoji}`;
-  span.style.position = "relative";
-  span.classList.add("brand-span"); // Add a class to the span for identification
-  span.dataset.brand = JSON.stringify(brand); // Store the brand data in the dataset
+  // Create a span for the container
+  const containerSpan = document.createElement("span");
+  containerSpan.style.position = "relative";
+  containerSpan.classList.add("brand-span"); // Add a class to the span for identification
+  containerSpan.dataset.brand = JSON.stringify(brand); // Store the brand data in the dataset
 
-  return span;
+  // Create a span for the brand name
+  const brandNameSpan = document.createElement("span");
+  brandNameSpan.textContent = match;
+  brandNameSpan.style.position = "relative";
+  brandNameSpan.classList.add("brand-name-span"); // Add a class to the span for identification
+  brandNameSpan.dataset.brand = JSON.stringify(brand); // Store the brand data in the dataset
+
+  // Create a span for the emoji
+  const emojiSpan = document.createElement("span");
+  emojiSpan.textContent = brandCategory.emoji;
+  emojiSpan.style.position = "relative";
+  emojiSpan.classList.add("emoji-span"); // Add a class to the span for identification
+
+  // Append both spans to the container span
+  containerSpan.appendChild(brandNameSpan);
+  containerSpan.appendChild(emojiSpan);
+
+  return containerSpan;
 }
+
+
 
 // Function to traverse and add emojis to all text nodes on the page
 function traverseAndAddEmojis(node, brandData) {
@@ -278,37 +309,58 @@ let hideTooltipTimeout = 5;
 
 let activeTooltip = null;
 
-document.body.addEventListener('mouseover', (event) => {
+document.body.addEventListener('click', (event) => {
   const target = event.target;
-  if (target.classList.contains('brand-span')) {
-    const existingTooltip = target.querySelector("div");
+  event.preventDefault();
 
-    // Check if there is an active tooltip
-    if (activeTooltip && activeTooltip !== existingTooltip) {
-      activeTooltip.style.display = 'none';
-      activeTooltip = null;
-    }
+  if (target.classList.contains('emoji-span')) {
+    const brandSpan = target.closest('.brand-span');
 
-    if (existingTooltip && existingTooltip.style.display === "block") {
-      return;
-    }
+    if (brandSpan) {
+      const brandNameSpan = brandSpan.querySelector('.brand-name-span');
+      const existingTooltip = brandSpan.querySelector("div");
 
-    const brand = JSON.parse(target.dataset.brand);
-    const tooltip = createTooltip(brand);
+      // Check if there is an active tooltip
+      if (activeTooltip && activeTooltip !== existingTooltip) {
+        activeTooltip.style.display = 'none';
+        activeTooltip = null;
+      }
 
-    if (tooltip) {
-      const rect = target.getBoundingClientRect();
-      tooltip.style.left = `${rect.left}px`;
-      tooltip.style.top = `${rect.bottom}px`;
+      // Toggle the display of the tooltip
+      const brand = JSON.parse(brandSpan.dataset.brand);
+      let tooltip = existingTooltip;
 
-      target.appendChild(tooltip);
-      addTooltipEventListeners(tooltip, target);
+      if (!tooltip) {
+        tooltip = createTooltip(brand);
+
+        if (tooltip) {
+          const rect = brandSpan.getBoundingClientRect();
+          tooltip.style.left = `${rect.left}px`;
+          tooltip.style.top = `${rect.bottom}px`;
+
+          brandSpan.appendChild(tooltip);
+          addTooltipEventListeners(tooltip, brandSpan);
+        }
+      }
+
+      // Toggle the display based on the current state
+      const isTooltipVisible = tooltip.style.display === "block";
+      tooltip.style.display = isTooltipVisible ? "none" : "block";
+
       clearTimeout(hideTooltipTimeout);
-      tooltip.style.display = "block";
-      activeTooltip = tooltip; // Set the active tooltip
+      if (tooltip.style.display === "block") {
+        activeTooltip = tooltip; // Set the active tooltip
+      }
+
+      event.preventDefault(); // Prevent the default behavior of links
     }
   }
 });
+
+
+
+
+
 
 function addTooltipEventListeners(tooltip, brandSpan) {
   let isTooltipHovered = false;
@@ -351,7 +403,7 @@ function addTooltipEventListeners(tooltip, brandSpan) {
       hideTooltipTimeout = setTimeout(() => {
         tooltip.style.display = 'none';
         activeTooltip = null; // Clear the active tooltip
-      }, 500);
+      }, 0);
     }
   }
 }
