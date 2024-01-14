@@ -45,7 +45,7 @@
         "https://auchan.ua/*",
         "https://fozzyshop.ua/*",
         "https://megamarket.ua/*",
-        "https://zakaz.atbmarket.com/*",
+        "*://*.atbmarket.com/*",
         "https://shop.silpo.ua/*",
         "https://shop.nashkraj.ua/*",
         "https://ek.ua/*",
