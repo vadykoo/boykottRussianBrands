@@ -1,4 +1,3 @@
-let observer;
 class TrieNode {
   constructor() {
     this.children = {};
@@ -51,13 +50,11 @@ function addEmojisToTextNode(textNode, brandData) {
             // Split brand name into words
             const brandWords = brandName.split(' ');
 
-            // Insert each word into the trie
-            brandWords.forEach((word) => {
-              trie.insert(word, { name: brandName, category: brandCategory, brand: brand });
-            });
+            // Insert the entire brand name as a single entity into the trie
+            trie.insert(brandName.toLowerCase(), { name: brandName, category: brandCategory, brand: brand });
           });
         } else if (brandCategory.name === "Custom Brands") {
-          trie.insert(brand.name, {
+          trie.insert(brand.name.toLowerCase(), {
             name: brand.name,
             category: brandCategory,
             brand: brand,
@@ -111,6 +108,7 @@ function addEmojisToTextNode(textNode, brandData) {
   }
 }
 
+
 // Function to check if a string has numbers
 function hasNumbers(word) {
   return /\d/.test(word);
@@ -134,18 +132,19 @@ function createTooltip(brand) {
   tooltip.style.left = "0";
   tooltip.style.width = "240px";
   tooltip.style.padding = "16px";
-  tooltip.style.background = "#e2f8ee";
-  tooltip.style.color = "#414141";
+  tooltip.style.background = "#3498DB";
+  tooltip.style.color = "#fff";
   tooltip.style.fontSize = "14px";
   tooltip.style.borderRadius = "8px";
-  tooltip.style.zIndex = "9999";
+  tooltip.style.zIndex = "9999"; 
+  tooltip.style.fontFamily = "Montserrat"; 
 
   let tooltipHTML = "";
   if (brand.description) {
-    tooltipHTML += `<p>${brand.description}</p>`;
+    tooltipHTML += `<p style="padding-bottom: 20px">${brand.description}</p>`;
   }
   if (brand.linkSource) {
-    tooltipHTML += `<a href="${brand.linkSource}" target="_blank">Дізнатись більше</a>`;
+    tooltipHTML += `<a href="${brand.linkSource}" style="text-decoration:underline;color: #fff; padding-top: 20px important!" target="_blank">Дізнатись більше</a>`;
   }
   tooltip.innerHTML = tooltipHTML;
 
@@ -208,6 +207,7 @@ chrome.storage.local.get(
   ({ brandData, extensionEnabled }) => {
     if (!extensionEnabled) {
       console.log("Extension is disabled");
+      removeEventListeners(); // Remove event listeners if extension is disabled
       return;
     }
 
@@ -274,7 +274,7 @@ chrome.storage.local.get(
   },
 );
 
-let hideTooltipTimeout;
+let hideTooltipTimeout = 5;
 function addTooltipEventListeners(tooltip, brandSpan) {
   let isTooltipHovered = false;
   let isBrandSpanHovered = false;
@@ -349,3 +349,11 @@ document.body.addEventListener('mouseover', (event) => {
     }
   }
 });
+
+
+// Add a function to remove event listeners
+function removeEventListeners() {
+  window.removeEventListener("load", processPage);
+  window.removeEventListener("hashchange", processPage);
+  window.removeEventListener("popstate", processPage);
+}
