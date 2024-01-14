@@ -312,20 +312,8 @@ let activeTooltip = null;
 
 document.body.addEventListener('mouseover', (event) => {
   const target = event.target;
-  
+
   if (target.classList.contains('emoji-span')) {
-
-        // // Find the parent link element
-        // const linkElement = target.closest('a');
-        // console.log(linkElement)
-        // if (linkElement) {
-        //   // Prevent the default behavior of the click event (e.g., navigating to the link)
-        //   event.preventDefault();
-    
-        //   // Stop the event propagation to prevent it from reaching the anchor element
-        //   event.stopPropagation();
-        // }
-
     const brandSpan = target.closest('.brand-span');
 
     if (brandSpan) {
@@ -342,11 +330,17 @@ document.body.addEventListener('mouseover', (event) => {
       const brand = JSON.parse(brandSpan.dataset.brand);
       let tooltip = existingTooltip;
 
-      if (!tooltip) {
+      if (tooltip) {
+        // Update the position of the existing tooltip
+        const rect = target.getBoundingClientRect(); // Use the target (emoji-span) for positioning
+        tooltip.style.left = `${rect.left}px`;
+        tooltip.style.top = `${rect.bottom}px`; // Position the tooltip under the emoji-span
+      } else {
+        // If tooltip doesn't exist, create and append a new one
         tooltip = createTooltip(brand);
 
         if (tooltip) {
-          const rect = brandSpan.getBoundingClientRect();
+          const rect = target.getBoundingClientRect();
           tooltip.style.left = `${rect.left}px`;
           tooltip.style.top = `${rect.bottom}px`;
 
@@ -366,6 +360,7 @@ document.body.addEventListener('mouseover', (event) => {
     }
   }
 });
+
 
 function addTooltipEventListeners(tooltip, brandSpan) {
   let isTooltipHovered = false;
