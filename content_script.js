@@ -275,45 +275,74 @@ chrome.storage.local.get(
 );
 
 let hideTooltipTimeout = 5;
+
+let activeTooltip = null;
+
+document.body.addEventListener('mouseover', (event) => {
+  const target = event.target;
+  if (target.classList.contains('brand-span')) {
+    const existingTooltip = target.querySelector("div");
+
+    // Check if there is an active tooltip
+    if (activeTooltip && activeTooltip !== existingTooltip) {
+      activeTooltip.style.display = 'none';
+      activeTooltip = null;
+    }
+
+    if (existingTooltip && existingTooltip.style.display === "block") {
+      return;
+    }
+
+    const brand = JSON.parse(target.dataset.brand);
+    const tooltip = createTooltip(brand);
+
+    if (tooltip) {
+      const rect = target.getBoundingClientRect();
+      tooltip.style.left = `${rect.left}px`;
+      tooltip.style.top = `${rect.bottom}px`;
+
+      target.appendChild(tooltip);
+      addTooltipEventListeners(tooltip, target);
+      clearTimeout(hideTooltipTimeout);
+      tooltip.style.display = "block";
+      activeTooltip = tooltip; // Set the active tooltip
+    }
+  }
+});
+
 function addTooltipEventListeners(tooltip, brandSpan) {
   let isTooltipHovered = false;
   let isBrandSpanHovered = false;
 
-  // Mouseover event listener for the tooltip
   tooltip.addEventListener('mouseover', () => {
     isTooltipHovered = true;
-    clearTimeout(hideTooltipTimeout); // Cancel the tooltip hide timeout
+    clearTimeout(hideTooltipTimeout);
   });
 
-  // Mouseout event listener for the tooltip
   tooltip.addEventListener('mouseout', () => {
     isTooltipHovered = false;
     checkAndHideTooltip();
   });
 
-  // Mouseover event listener for the brand span
   brandSpan.addEventListener('mouseover', () => {
     isBrandSpanHovered = true;
-    clearTimeout(hideTooltipTimeout); // Cancel the tooltip hide timeout
+    clearTimeout(hideTooltipTimeout);
   });
 
-  // Mouseout event listener for the brand span
   brandSpan.addEventListener('mouseout', () => {
     isBrandSpanHovered = false;
     checkAndHideTooltip();
   });
 
-  // Prevent click events from propagating to underlying elements
   tooltip.addEventListener('click', (event) => {
     event.stopPropagation();
   });
 
-  // Add click event listener to open the link in a new tab/window
   const link = tooltip.querySelector('a');
   if (link) {
     link.addEventListener('click', (event) => {
-      event.stopPropagation(); // Prevent click event from reaching underlying elements
-      window.open(link.href, '_blank'); // Open the link in a new tab/window
+      event.stopPropagation();
+      window.open(link.href, '_blank');
     });
   }
 
@@ -321,34 +350,12 @@ function addTooltipEventListeners(tooltip, brandSpan) {
     if (!isTooltipHovered && !isBrandSpanHovered) {
       hideTooltipTimeout = setTimeout(() => {
         tooltip.style.display = 'none';
-      }, 500); // 500ms delay before hiding the tooltip
+        activeTooltip = null; // Clear the active tooltip
+      }, 500);
     }
   }
 }
-document.body.addEventListener('mouseover', (event) => {
-  if (event.target.classList.contains('brand-span')) {
-    // Check if a tooltip is already displayed
-    const existingTooltip = event.target.querySelector("div");
-    if (existingTooltip && existingTooltip.style.display === "block") {
-      return;
-    }
 
-    // If not, create a new tooltip
-    const brand = JSON.parse(event.target.dataset.brand);
-    const tooltip = createTooltip(brand);
-    if (tooltip) {
-      // Calculate the position of the tooltip
-      const rect = event.target.getBoundingClientRect();
-      tooltip.style.left = `${rect.left}px`;
-      tooltip.style.top = `${rect.bottom}px`;
-
-      event.target.appendChild(tooltip);
-      addTooltipEventListeners(tooltip, event.target); // Add event listeners to the tooltip and brand span
-      clearTimeout(hideTooltipTimeout);
-      tooltip.style.display = "block";
-    }
-  }
-});
 
 
 // Add a function to remove event listeners
