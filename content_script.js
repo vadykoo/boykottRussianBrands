@@ -54,10 +54,10 @@ function addEmojisToTextNode(node, brandData) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            const re = new RegExp(`(?:^|\\s)(${escapeRegExp(brandName)})(?:$|\\s)`, 'giu');
+            const re = new RegExp(`(^|\\s)(${escapeRegExp(brandName)})(\\s|$)`, 'giu');
             let match;
             while ((match = re.exec(node.data)) !== null) {
-              const span = createBrandSpan(match[1], brandCategory, brand);
+              const span = createBrandSpan(match[1] + match[2] + match[3], brandCategory, brand);
               const range = document.createRange();
               range.setStart(node, match.index);
               range.setEnd(node, match.index + match[0].length);
@@ -95,11 +95,28 @@ function hasBrandNameWithoutEmoji(node) {
 }
 
 
+function hasBrandNameWithoutEmoji(node) {
+  let currentNode = node;
 
-// Function to check if a string has numbers
-function hasNumbers(word) {
-  return /\d/.test(word);
+  // Traverse ancestors until the root
+  while (currentNode && currentNode !== document) {
+    if (currentNode.nodeType === 1 && currentNode.classList.contains('brand-span')) {
+      const hasEmojiDescendant = currentNode.querySelector('.emoji-span');
+      if (hasEmojiDescendant) {
+        return true;
+      }
+    }
+
+    currentNode = currentNode.parentNode;
+  }
+
+  return false;
 }
+
+// // Function to check if a string has numbers
+// function hasNumbers(word) {
+//   return /\d/.test(word);
+// }
 
 // Function to create a tooltip
 function createTooltip(brand) {
@@ -185,8 +202,6 @@ function createBrandSpan(match, brandCategory, brand) {
 
   return containerSpan;
 }
-
-
 
 // Function to traverse and add emojis to all text nodes on the page
 function traverseAndAddEmojis(node, brandData) {
@@ -327,10 +342,11 @@ document.body.addEventListener('mouseover', (event) => {
         }
       }
 
-      // Toggle the display based on the current state
-      const isTooltipVisible = tooltip.style.display === "block";
-      tooltip.style.display = isTooltipVisible ? "none" : "block";
-
+      if (tooltip) {
+        // Toggle the display based on the current state
+        const isTooltipVisible = tooltip.style.display === "block";
+        tooltip.style.display = isTooltipVisible ? "none" : "block";
+      }
       clearTimeout(hideTooltipTimeout);
       if (tooltip.style.display === "block") {
         activeTooltip = tooltip; // Set the active tooltip

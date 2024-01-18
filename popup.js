@@ -64,34 +64,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    // Add event listener to update the list of custom brands
-    const addCustomBrandButton = document.getElementById("addCustomBrandButton");
-    addCustomBrandButton.addEventListener("click", () => {
-      const customBrandInput = document.getElementById("customBrandInput");
-      const customBrand = customBrandInput.value.trim();
-      if (customBrand) {
-        chrome.runtime.sendMessage(
-          { action: "addCustomBrand", brand: customBrand.toLowerCase() },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              console.error(chrome.runtime.lastError.message);
-            } else {
-              console.log(`Custom brand '${customBrand}' added`);
-              customBrandInput.value = "";
+    // // Add event listener to update the list of custom brands
+    // const addCustomBrandButton = document.getElementById("addCustomBrandButton");
+    // addCustomBrandButton.addEventListener("click", () => {
+    //   const customBrandInput = document.getElementById("customBrandInput");
+    //   const customBrand = customBrandInput.value.trim();
+    //   if (customBrand) {
+    //     chrome.runtime.sendMessage(
+    //       { action: "addCustomBrand", brand: customBrand.toLowerCase() },
+    //       (response) => {
+    //         if (chrome.runtime.lastError) {
+    //           console.error(chrome.runtime.lastError.message);
+    //         } else {
+    //           console.log(`Custom brand '${customBrand}' added`);
+    //           customBrandInput.value = "";
   
-              // Update the list of custom brands
-              chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
-                updateCustomBrandsList(customBrands);
-              });
-            }
-          }
-        );
-      }
-    });
+    //           // Update the list of custom brands
+    //           chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
+    //             updateCustomBrandsList(customBrands);
+    //           });
+    //         }
+    //       }
+    //     );
+    //   }
+    // });
   
-    chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
-      updateCustomBrandsList(customBrands);
-    });
+    // chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
+    //   updateCustomBrandsList(customBrands);
+    // });
 
 
     //search
