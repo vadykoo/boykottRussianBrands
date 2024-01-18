@@ -31,7 +31,7 @@ const defaultCustomBrands = {
 };
 
 function saveDefaultBrandDataToStorage() {
-  chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+  chrome.storage.local.get({ brandData: null, tooltipEnabled: true }, ({ brandData, tooltipEnabled }) => {
     if (!brandData) {
       // If brandData is not in local storage, fetch the defaultBrandData
       fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
@@ -48,6 +48,12 @@ fetchBrandDataFromGithub();
 saveDefaultBrandDataToStorage();
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "toggleTooltipSetting") {
+    chrome.storage.local.set({ tooltipEnabled: message.enabled }, () => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
   if (message.action === "fetchBrandData") {
     fetchBrandDataFromGithub().then((brandData) => {
       console.log(brandData);
@@ -158,6 +164,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 function fetchBrandDataFromGithub() {
   return fetch("https://raw.githubusercontent.com/vadykoo/russianBrandsInUkraine/master/russianInternationalBrandsNew.json")
   .then((response) => response.json())
+    .then((fetchedBrandData) => {
+      return chrome.storage.local.get({ tooltipEnabled: true })
+        .then(({ tooltipEnabled }) => {
+          fetchedBrandData.tooltipEnabled = tooltipEnabled;
+          return fetchedBrandData;
+        });
+    })
   .then((fetchedBrandData) => {
     return new Promise((resolve, reject) => {
       fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
