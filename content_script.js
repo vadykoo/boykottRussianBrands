@@ -39,15 +39,13 @@ class Trie {
 }
 
 function escapeRegExp(string) {
-  // Include Cyrillic characters in the regular expression
   const specialCharsRegExp = /[.*+?^${},()|[\]\\]/gu;
   return string.replace(specialCharsRegExp, '\\$&');
 }
 
 function addEmojisToTextNode(node, brandData) {
-    let textNode = node;
-    if (!textNode.nodeValue || textNode.nodeValue.trim().length <= 4) return;
-  // console.log(textNode)
+  let textNode = node;
+  if (!textNode.nodeValue || textNode.nodeValue.trim().length <= 4) return;
 
   if (hasBrandNameWithoutEmoji(textNode)) return;
 
@@ -56,137 +54,46 @@ function addEmojisToTextNode(node, brandData) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            const re = new RegExp(`\\b${escapeRegExp(brandName)}\\b`, 'giu');
-        let match;
-        while ((match = re.exec(node.data)) !== null) {
-          const span = createBrandSpan(brandName, brandCategory, brand);
-          const range = document.createRange();
-          range.setStart(node, match.index);
-          range.setEnd(node, match.index + match[0].length);
-          range.deleteContents();
-          range.insertNode(span);
-          re.lastIndex -= match[0].length;
-          node = span.nextSibling;
-          if (!node) {
-            break;
-          }
+            const re = new RegExp(`(?:^|\\s)(${escapeRegExp(brandName)})(?:$|\\s)`, 'giu');
+            let match;
+            while ((match = re.exec(node.data)) !== null) {
+              const span = createBrandSpan(match[1], brandCategory, brand);
+              const range = document.createRange();
+              range.setStart(node, match.index);
+              range.setEnd(node, match.index + match[0].length);
+              range.deleteContents();
+              range.insertNode(span);
+              re.lastIndex -= match[0].length;
+              node = span.nextSibling;
+              if (!node) {
+                break;
+              }
+            }
+          });
         }
-      })
+      });
     }
-  })
+  });
 }
-  })
 
-  function hasBrandNameWithoutEmoji(node) {
-    let currentNode = node;
-  
-    // Traverse ancestors until the root
-    while (currentNode && currentNode !== document) {
-      if (currentNode.nodeType === 1 && currentNode.classList.contains('brand-span')) {
-        const hasEmojiDescendant = currentNode.querySelector('.emoji-span');
-        if (hasEmojiDescendant) {
-          return true;
-        }
+function hasBrandNameWithoutEmoji(node) {
+  let currentNode = node;
+
+  // Traverse ancestors until the root
+  while (currentNode && currentNode !== document) {
+    if (currentNode.nodeType === 1 && currentNode.classList.contains('brand-span')) {
+      const hasEmojiDescendant = currentNode.querySelector('.emoji-span');
+      if (hasEmojiDescendant) {
+        return true;
       }
-      
-      currentNode = currentNode.parentNode;
     }
-  
-    return false;
+
+    currentNode = currentNode.parentNode;
   }
+
+  return false;
 }
 
-
-// function addEmojisToTextNode(textNode, brandData) {
-//   if (!textNode.nodeValue || textNode.nodeValue.trim().length <= 4) return;
-//   // console.log(textNode)
-
-//   if (hasBrandNameWithoutEmoji(textNode)) return;
-
-//   const trie = new Trie();
-//   brandData.forEach((brandCategory) => {
-//     if (brandCategory.enabled) {
-//       brandCategory.names.forEach((brand) => {
-//         if (brand.names) {
-//           brand.names.forEach((brandName) => {
-//             // Split brand name into words
-//             const brandWords = brandName.split(' ');
-
-//             // Insert the entire brand name as a single entity into the trie
-//             trie.insert(brandName.toLowerCase(), { name: brandName, category: brandCategory, brand: brand });
-//           });
-//         } else if (brandCategory.name === "Custom Brands") {
-//           trie.insert(brand.name.toLowerCase(), {
-//             name: brand.name,
-//             category: brandCategory,
-//             brand: brand,
-//           });
-//         }
-//       });
-//     }
-//   });
-
-//     const words = textNode.nodeValue.split(' ').filter(word => {
-//     // Filter out prices, empty strings, and strings smaller than 4 characters
-//     return word.trim().length >= 4;
-//   });
-
-//   let matchedBrandWords = [];
-//   for (let i = 0; i < words.length; i++) {
-//     const word = words[i];
-//     const matchedBrand = trie.search(word.toLowerCase());
-//     if (matchedBrand) {
-//       matchedBrandWords.push(word);
-//       if (matchedBrandWords.join(' ').toLowerCase() === matchedBrand.name) {
-//         const parent = textNode.parentNode;
-//         if (!parent) {
-//           break;
-//         }
-
-//         const wordIndex = textNode.nodeValue.indexOf(matchedBrandWords.join(' '));
-//         const preMatchTextNode = document.createTextNode(textNode.nodeValue.slice(0, wordIndex));
-//         const postMatchTextNode = document.createTextNode(textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length));
-
-//         if (parent && matchedBrand) {
-//           parent.insertBefore(preMatchTextNode, textNode);
-//           const span = createBrandSpan(matchedBrandWords.join(' '), matchedBrand.category, matchedBrand.brand);
-//           parent.insertBefore(span, textNode);
-
-//           const remainingText = textNode.nodeValue.slice(wordIndex + matchedBrandWords.join(' ').length);
-//           if (remainingText) {
-//             const remainingTextNode = document.createTextNode(remainingText);
-//             parent.insertBefore(remainingTextNode, textNode);
-//           }
-
-//           parent.removeChild(textNode);
-//         }
-
-//         textNode = postMatchTextNode;
-//         matchedBrandWords = [];
-//       }
-//     } else {
-//       matchedBrandWords = [];
-//     }
-//   }
-// // Function to check if the parent contains a brand name span without any descendant emoji span
-// function hasBrandNameWithoutEmoji(node) {
-//   let currentNode = node;
-
-//   // Traverse ancestors until the root
-//   while (currentNode && currentNode !== document) {
-//     if (currentNode.nodeType === 1 && currentNode.classList.contains('brand-span')) {
-//       const hasEmojiDescendant = currentNode.querySelector('.emoji-span');
-//       if (hasEmojiDescendant) {
-//         return true;
-//       }
-//     }
-    
-//     currentNode = currentNode.parentNode;
-//   }
-
-//   return false;
-// }
-// }
 
 
 // Function to check if a string has numbers
