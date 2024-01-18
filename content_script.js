@@ -189,7 +189,7 @@ function createBrandSpan(match, brandCategory, brand) {
 
 
 // Function to traverse and add emojis to all text nodes on the page
-function traverseAndAddEmojis(node, brandData) {
+function traverseAndAddEmojis(node, brandData, tooltipEnabled) {
   if (node.nodeType === Node.TEXT_NODE) {
     addEmojisToTextNode(node, brandData);
   } else if (
@@ -201,7 +201,7 @@ function traverseAndAddEmojis(node, brandData) {
     let i = 0;
     function processNextChild() {
       if (i < node.childNodes.length) {
-        traverseAndAddEmojis(node.childNodes[i], brandData);
+        if (tooltipEnabled) { traverseAndAddEmojis(node.childNodes[i], brandData, tooltipEnabled); }
         i++;
         processNextChild();
       }
@@ -213,7 +213,7 @@ function traverseAndAddEmojis(node, brandData) {
 
 // Retrieve brandData from local storage or use default values
 chrome.storage.local.get(
-  { brandData: null, extensionEnabled: true },
+  { brandData: null, extensionEnabled: true, tooltipEnabled: true },
   ({ brandData, extensionEnabled }) => {
     if (!extensionEnabled) {
       console.log("Extension is disabled");
@@ -231,7 +231,7 @@ chrome.storage.local.get(
       let pendingMutations = false;
 
       requestIdleCallback(() => {
-        traverseAndAddEmojis(document.body, brandData);
+        traverseAndAddEmojis(document.body, brandData, tooltipEnabled);
       });
 
       observer = new MutationObserver((mutationsList) => {
@@ -248,7 +248,7 @@ chrome.storage.local.get(
               if (node.nodeType === Node.TEXT_NODE) {
                 addEmojisToTextNode(node, brandData);
               } else if (node.nodeType === Node.ELEMENT_NODE) {
-                traverseAndAddEmojis(node, brandData);
+                if (tooltipEnabled) { traverseAndAddEmojis(node, brandData, tooltipEnabled); }
               }
             });
           }
@@ -264,7 +264,7 @@ chrome.storage.local.get(
                 if (node.nodeType === Node.TEXT_NODE) {
                   addEmojisToTextNode(node, brandData);
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
-                  traverseAndAddEmojis(node, brandData);
+                  if (tooltipEnabled) { traverseAndAddEmojis(node, brandData, tooltipEnabled); }
                 }
               });
             }
