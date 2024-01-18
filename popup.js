@@ -60,7 +60,11 @@ function updateCustomBrandsList(customBrands) {
 
 // Send a message to the background script when the popup is opened
 document.addEventListener("DOMContentLoaded", () => {
-  chrome.runtime.sendMessage({ action: "fetchBrandData" });
+  chrome.runtime.sendMessage({ action: "fetchBrandData" }, () => {
+    chrome.storage.local.get({ tooltipEnabled: true }, ({ tooltipEnabled }) => {
+      createTooltipSettingCheckbox(tooltipEnabled);
+    });
+  });
 
 
 
@@ -87,6 +91,35 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         );
       }
+  // Create the tooltip setting checkbox
+  function createTooltipSettingCheckbox(enabled) {
+    const settingsForm = document.getElementById("settingsForm");
+    const tooltipSettingTemplate = document.getElementById("tooltipSettingTemplate");
+    const tooltipSettingContainer = tooltipSettingTemplate.content.cloneNode(true);
+
+    const tooltipCheckbox = tooltipSettingContainer.querySelector(".tooltipCheckbox");
+    tooltipCheckbox.checked = enabled;
+
+    const label = tooltipSettingContainer.querySelector(".tooltipLabel");
+    label.textContent = "Enable Tooltips";
+
+    settingsForm.appendChild(tooltipSettingContainer);
+
+    // Add event listener to toggle tooltip setting and send message to background script
+    tooltipCheckbox.addEventListener("change", () => {
+      const toggleData = {
+        action: "toggleTooltipSetting",
+        enabled: tooltipCheckbox.checked,
+      };
+      chrome.runtime.sendMessage(toggleData, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError.message);
+        } else {
+          console.log(`Tooltip setting toggled: ${tooltipCheckbox.checked}`);
+        }
+      });
+    });
+  }
     });
   
     chrome.storage.local.get({ customBrands: [] }, ({ customBrands }) => {
@@ -264,3 +297,9 @@ function updateUserSettings(name, enabled) {
     console.log('usersett', userSettings);
   });
 }
+  // Call createTooltipSettingCheckbox within the DOMContentLoaded event listener
+  document.addEventListener("DOMContentLoaded", () => {
+    chrome.storage.local.get({ tooltipEnabled: true }, ({ tooltipEnabled }) => {
+      createTooltipSettingCheckbox(tooltipEnabled);
+    });
+  });
