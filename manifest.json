@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Boycott russian Brands +Список НАЗК",
-  "version": "1.0.8",
-  "description": "Надає товарам важливий контекст в інтернет магазинах",
+  "name": "Національний Кешбек всі бренди та Boycott russian Brands",
+  "version": "1.1.0",
+  "description": "Допоможе визначити товари з cashback, надає товарам важливий контекст в інтернет магазинах",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
