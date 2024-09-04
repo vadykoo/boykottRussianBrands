@@ -46,17 +46,17 @@ chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
   });
 });
 
-// Update the list of custom brands in the popup
-function updateCustomBrandsList(customBrands) {
-  const customBrandsUl = document.getElementById("customBrandsUl");
-  customBrandsUl.innerHTML = ""; // Clear the existing list
+// // Update the list of custom brands in the popup
+// function updateCustomBrandsList(customBrands) {
+//   const customBrandsUl = document.getElementById("customBrandsUl");
+//   customBrandsUl.innerHTML = ""; // Clear the existing list
 
-  customBrands.forEach((customBrand) => {
-    const listItem = document.createElement("li");
-    listItem.textContent = customBrand.name;
-    customBrandsUl.appendChild(listItem);
-  });
-}
+//   customBrands.forEach((customBrand) => {
+//     const listItem = document.createElement("li");
+//     listItem.textContent = customBrand.name;
+//     customBrandsUl.appendChild(listItem);
+//   });
+// }
 
 // Send a message to the background script when the popup is opened
 document.addEventListener("DOMContentLoaded", () => {
@@ -177,7 +177,8 @@ fetchBrandDataButton.addEventListener("click", () => {
     } else {
       // Force fetch the brand data again and update the brand count
       chrome.storage.local.set({ fetchTime: null }, () => {
-        brandCount.textContent = `Number of brands on server: ${response.brandCount}`;
+        // brandCount.textContent = `Number of brands on server: ${response.brandCount}`;
+        brandCount.textContent = `Оновлено`;
       });
     }
 

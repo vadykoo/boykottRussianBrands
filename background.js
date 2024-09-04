@@ -23,12 +23,12 @@ var defaultBrandData = [
 
 var userSettings;
 
-const defaultCustomBrands = {
-  name: "Custom Brands",
-  enabled: true,
-  names: [], // Custom brands will be added here
-  emoji: "🚩",
-};
+// const defaultCustomBrands = {
+//   name: "Custom Brands",
+//   enabled: true,
+//   names: [], // Custom brands will be added here
+//   emoji: "🚩",
+// };
 
 function saveDefaultBrandDataToStorage() {
   chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
@@ -36,7 +36,7 @@ function saveDefaultBrandDataToStorage() {
       // If brandData is not in local storage, fetch the defaultBrandData
       fetchDefaultBrandDataFromGithub().then((defaultBrandData) => {
         // Save the defaultBrandData to local storage
-        console.log(defaultBrandData);
+        // console.log(defaultBrandData);
         chrome.storage.local.set({ brandData: defaultBrandData });
       });
     }
@@ -71,36 +71,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: true });
       });
     });
-
-    // Add customBrands to brandData only here
-    chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
-      if (!brandData) {
-        brandData = defaultBrandData; // Use default brand data if not found in local storage
-      }
-
-      const customBrandCategory = brandData.find(
-        (category) => category.name === "Custom Brands",
-      );
-      if (!customBrandCategory) {
-        brandData.push({
-          name: "Custom Brands",
-          enabled: true,
-          names: [{ name: message.brand, enabled: true, emoji: "🚩" }],
-          emoji: "🚩",
-        });
-      } else {
-        customBrandCategory.names.push({
-          name: message.brand,
-          enabled: true,
-          emoji: "🚩",
-        });
-      }
-      // Save the updated brandData to local storage
-      chrome.storage.local.set({ brandData }, () => {
-        sendResponse({ success: true });
-      });
-    });
   }
+  //   // Add customBrands to brandData only here
+  //   chrome.storage.local.get({ brandData: null }, ({ brandData }) => {
+  //     if (!brandData) {
+  //       brandData = defaultBrandData; // Use default brand data if not found in local storage
+  //     }
+
+  //     const customBrandCategory = brandData.find(
+  //       (category) => category.name === "Custom Brands",
+  //     );
+  //     if (!customBrandCategory) {
+  //       brandData.push({
+  //         name: "Custom Brands",
+  //         enabled: true,
+  //         names: [{ name: message.brand, enabled: true, emoji: "🚩" }],
+  //         emoji: "🚩",
+  //       });
+  //     } else {
+  //       customBrandCategory.names.push({
+  //         name: message.brand,
+  //         enabled: true,
+  //         emoji: "🚩",
+  //       });
+  //     }
+  //     // Save the updated brandData to local storage
+  //     chrome.storage.local.set({ brandData }, () => {
+  //       sendResponse({ success: true });
+  //     });
+  //   });
+  // }
 
   // Check if the message is from the popup
   if (sender.tab === undefined) {
@@ -239,19 +239,19 @@ function fetchBrandDataFromGithub() {
                   }
                 }
 
-                // Check if customBrands is included in brandData
-                const customBrandCategory = brandData.find(
-                  (category) => category.name === "Custom Brands"
-                );
-                if (!customBrandCategory) {
-                  // If not, append customBrands to brandData
-                  brandData.push({
-                    name: "Custom Brands",
-                    enabled: true,
-                    names: customBrands,
-                    emoji: "🚩",
-                  });
-                }
+                // // Check if customBrands is included in brandData
+                // const customBrandCategory = brandData.find(
+                //   (category) => category.name === "Custom Brands"
+                // );
+                // if (!customBrandCategory) {
+                //   // If not, append customBrands to brandData
+                //   brandData.push({
+                //     name: "Custom Brands",
+                //     enabled: true,
+                //     names: customBrands,
+                //     emoji: "🚩",
+                //   });
+                // }
 
                 // Save the updated brandData to local storage
                 chrome.storage.local.set({ brandData }, () => {

@@ -1,46 +1,47 @@
-class TrieNode {
-  constructor() {
-    this.children = {};
-    this.endOfWord = null;
-  }
-}
+//implement tree in the next release
+// class TrieNode {
+//   constructor() {
+//     this.children = {};
+//     this.endOfWord = null;
+//   }
+// }
 
-class Trie {
-  constructor() {
-    this.root = new TrieNode();
-  }
+// class Trie {
+//   constructor() {
+//     this.root = new TrieNode();
+//   }
 
-  insert(word, brand) {
-    if (typeof word !== 'string') {
-      return null;
-    }
+//   insert(word, brand) {
+//     if (typeof word !== 'string') {
+//       return null;
+//     }
 
-    let node = this.root;
-    for (let char of word) {
-      if (!node.children[char]) {
-        node.children[char] = new TrieNode();
-      }
-      node = node.children[char];
-    }
-    node.endOfWord = brand;
-  }
+//     let node = this.root;
+//     for (let char of word) {
+//       if (!node.children[char]) {
+//         node.children[char] = new TrieNode();
+//       }
+//       node = node.children[char];
+//     }
+//     node.endOfWord = brand;
+//   }
 
-  search(word) {
-    let node = this.root;
-    for (let char of word) {
-      if (!node.children[char]) {
-        return null;
-      }
-      node = node.children[char];
-    }
+//   search(word) {
+//     let node = this.root;
+//     for (let char of word) {
+//       if (!node.children[char]) {
+//         return null;
+//       }
+//       node = node.children[char];
+//     }
 
-    return node.endOfWord;
-  }
-}
+//     return node.endOfWord;
+//   }
+// }
 
 function escapeRegExp(string) {
   const specialCharsRegExp = /[.*+?^${},()|[\]\\]/gu;
-  return string.replace(specialCharsRegExp, '\\$&');
+  return string.replace(specialCharsRegExp, '\\$&,');
 }
 
 function addEmojisToTextNode(node, brandData) {
@@ -54,7 +55,8 @@ function addEmojisToTextNode(node, brandData) {
       brandCategory.names.forEach((brand) => {
         if (brand.names) {
           brand.names.forEach((brandName) => {
-            const re = new RegExp(`(^|\\s)(${escapeRegExp(brandName)})(\\s|$)`, 'giu');
+            try {
+              const re = new RegExp(`(^|\\s)(${escapeRegExp(brandName)})(\\s|$)`, 'giu');
             let match;
             while ((match = re.exec(node.data)) !== null) {
               const span = createBrandSpan(match[1] + match[2] + match[3], brandCategory, brand);
@@ -69,6 +71,9 @@ function addEmojisToTextNode(node, brandData) {
                 break;
               }
             }
+          } catch (error) {
+
+          }
           });
         }
       });
